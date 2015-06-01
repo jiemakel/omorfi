@@ -43,6 +43,15 @@ AC_ARG_ENABLE([apertium],
                              [enable_apertium=yes])
 AM_CONDITIONAL([WANT_APERTIUM], [test "x$enable_apertium" = xyes])
 
+AC_ARG_ENABLE([extras],
+            [AS_HELP_STRING([--enable-extras],
+            [enable extra features (from +propers+semantics+ktnkav+newparas+taggerhacks+segments+oldfinnish) @<:@default=no extras@:>@])],
+            [with_extras=$enableval],
+            [with_extras=])
+AC_SUBST([EXTRAS], [$with_extras])
+
+AM_CONDITIONAL([WANT_OLDFINNISH], [test "x$with_extras" != x${with_extras/+oldfinnish/}])
+
 AC_ARG_WITH([pbs-mail],
             [AS_HELP_STRING([set email for pbs job @<:@default=disable pbs@:>@])],
             [with_pbs_mail=$withval],

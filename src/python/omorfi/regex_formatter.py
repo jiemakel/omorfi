@@ -32,6 +32,8 @@ def format_rules_regex(format, ruleset):
         for p in fin_orth_pairs:
             regexstring += twolc_escape(p[0]) + ':' + twolc_escape(p[1]) + \
                     ' | ' + twolc_escape(p[0]) + ' | '
+        if '+oldfinnish' in format:
+            regexstring += 'v:w | k:0 s:0 0:x | t s:z | '
         regexstring += '? ]* ;'
     elif ruleset == 'zh':
         regexstring += '[ ž | ž:z 0:h | ž:z::1 ] ;'

@@ -30,13 +30,17 @@ LEMMA_JOINS=attributes/adjective-classes.tsv \
 PARADIGM_JOINS=paradigms/morphophonology.tsv \
 			   paradigms/stub-deletions.tsv
 
+if WANT_OLDFINNISH
+MAYBE_ARC=-arc
+endif
+
 # Morphology
 # stem variants by deletion and concatenations
 STEMPARTS=continuations/acronym-stems.tsv \
 		  continuations/adjective-stems.tsv \
 		  continuations/digit-stubs.tsv \
 		  continuations/digit-stems.tsv \
-		  continuations/noun-stems.tsv \
+		  continuations/noun-stems$(MAYBE_ARC).tsv \
 		  continuations/numeral-stems.tsv \
 		  continuations/particle-stems.tsv \
 		  continuations/pronoun-stems.tsv \
@@ -47,7 +51,7 @@ STEMPARTS=continuations/acronym-stems.tsv \
 INFLECTIONS=continuations/acro-inflections.tsv \
 			continuations/adjective-inflections.tsv \
 			continuations/digit-inflections.tsv \
-			continuations/noun-inflections.tsv \
+			continuations/noun-inflections$(MAYBE_ARC).tsv \
 			continuations/numeral-inflections.tsv \
 			continuations/particle-inflections.tsv \
 			continuations/pronoun-inflections.tsv \
@@ -231,7 +235,7 @@ generated/inflections.tsv: $(INFLECTIONS) generated/timestamp
 generated/omorfi.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
 	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
-		-i generated/inflections.tsv -o $@ -f=generic
+		-i generated/inflections.tsv -o $@ -f=generic$(EXTRAS)
 
 generated/omorfi-phon.twolc: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r phon -o $@
@@ -250,7 +254,7 @@ generated/omorfi-hyphens.twolc: generated/timestamp
 
 generated/omorfi-orthographic-variations.regex: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-regexes.py \
-		-r orthographic-variations -o $@
+		-r orthographic-variations -o $@ -f=generic$(EXTRAS)
 
 generated/omorfi-zh.regex: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-regexes.py \
