@@ -71,6 +71,8 @@ def format_alphabet_twolc(format, ruleset):
     elif ruleset == 'apertium':
         for mcs in common_multichars:
             twolcstring += twolc_escape(mcs) + ':0 ! deleting all specials\n'
+    elif ruleset == 'orthographic-arc':
+        pass
     else:
         print("Unknown ruleset", ruleset, file=stderr)
         exit(1)
@@ -97,6 +99,9 @@ def format_sets_twolc(format, ruleset):
                 '! Consonants\n'
     elif ruleset == 'apertium':
         pass
+    elif ruleset == 'orthographic-arc':
+        twolcstring += 'Vowels = ' + ' '.join(fin_vowels) + ' ;' + \
+                '! Vowels\n'
     else:
         print("missing ruleset", ruleset)
         exit(1)
@@ -140,6 +145,10 @@ def format_rules_twolc(format, ruleset):
     elif ruleset == 'apertium':
         twolcstring += '"Remove stuffs"\n'
         twolcstring += "a <= _ ; ! remove everywhere\n"
+    elif ruleset == 'orthographic-arc':
+        twolcstring += '"Ending apostrophe"\n'
+        twolcstring += '0:\' => VOWEL _ .#. ;\n'
+        twolcstring += '\twhere VOWEL in Vowels;\n'
     else:
         print("Unknown ruleset", ruleset, file=stderr)
         exit(1)

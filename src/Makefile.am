@@ -111,6 +111,7 @@ GENERIC_GENERATED=generated/omorfi-uppercase-any.twolc \
 				  generated/omorfi-uppercase-first.twolc \
 				  generated/omorfi-recase-any.twolc \
 				  generated/omorfi-phon.twolc \
+				  generated/omorfi-orthographic-variations-arc.twolc \
 				  generated/omorfi-zh.regex \
 				  generated/omorfi-sh.regex \
 				  generated/omorfi-orthographic-variations.regex \
@@ -252,6 +253,9 @@ generated/omorfi-uppercase-first.twolc: generated/timestamp
 generated/omorfi-hyphens.twolc: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r hyphens -o $@
 
+generated/omorfi-orthographic-variations-arc.twolc: generated/timestamp
+	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r orthographic-arc -o $@
+
 generated/omorfi-orthographic-variations.regex: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-regexes.py \
 		-r orthographic-variations -o $@ -f=generic$(EXTRAS)
@@ -370,12 +374,22 @@ generated/temporary.boundary-weights.hfst: generated/temporary.hyphenated.hfst \
 		generated/omorfi-boundary.reweight
 	$(HREW) -T generated/omorfi-boundary.reweight $< -o $@ 
 
+generated/omorfi-orthographic-variations-arc.hfst: generated/omorfi-orthographic-variations.regex.hfst \
+	generated/omorfi-orthographic-variations-arc.twolc.hfst
+	$(HIC) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations-arc.twolc.hfst -o $@
+
+if WANT_OLDFINNISH
+ORTHOGRAPHIC_VARIATIONS=generated/omorfi-orthographic-variations-arc.hfst
+else
+ORTHOGRAPHIC_VARIATIONS=generated/omorfi-orthographic-variations.regex.hfst
+endif
+
 # spelling variations
 generated/temporary.relaxed.hfst: generated/temporary.boundary-weights.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	generated/omorfi-orthographic-variations.regex.hfst
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.regex.hfst |\
+	$(ORTHOGRAPHIC_VARIATIONS)
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
@@ -454,8 +468,8 @@ generated/temporary-ftb3.hyphenated.hfst: generated/omorfi-ftb3.lexc.hfst \
 generated/temporary-ftb3.relaxed.hfst: generated/temporary-ftb3.hyphenated.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	generated/omorfi-orthographic-variations.regex.hfst
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.regex.hfst |\
+	$(ORTHOGRAPHIC_VARIATIONS)
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
@@ -514,8 +528,8 @@ generated/temporary-omor.hyphenated.hfst: generated/omorfi-omor.lexc.hfst \
 generated/temporary-omor.relaxed.hfst: generated/temporary-omor.hyphenated.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	generated/omorfi-orthographic-variations.regex.hfst
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.regex.hfst |\
+	$(ORTHOGRAPHIC_VARIATIONS)
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
