@@ -30,33 +30,39 @@ LEMMA_JOINS=attributes/adjective-classes.tsv \
 PARADIGM_JOINS=paradigms/morphophonology.tsv \
 			   paradigms/stub-deletions.tsv
 
-if WANT_OLDFINNISH
-MAYBE_ARC=-arc
-endif
-
 # Morphology
 # stem variants by deletion and concatenations
 STEMPARTS=continuations/acronym-stems.tsv \
 		  continuations/adjective-stems.tsv \
 		  continuations/digit-stubs.tsv \
 		  continuations/digit-stems.tsv \
-		  continuations/noun-stems$(MAYBE_ARC).tsv \
+		  continuations/noun-stems.tsv \
 		  continuations/numeral-stems.tsv \
 		  continuations/particle-stems.tsv \
 		  continuations/pronoun-stems.tsv \
 		  continuations/symbol-stems.tsv \
 		  continuations/51-stems.tsv \
 		  continuations/verb-stems.tsv
+
+if WANT_OLDFINNISH
+STEMPARTS+=continuations/noun-stems-arc.tsv
+endif
+
 # suffixes by concatenations
 INFLECTIONS=continuations/acro-inflections.tsv \
 			continuations/adjective-inflections.tsv \
 			continuations/digit-inflections.tsv \
-			continuations/noun-inflections$(MAYBE_ARC).tsv \
+			continuations/noun-inflections.tsv \
 			continuations/numeral-inflections.tsv \
 			continuations/particle-inflections.tsv \
 			continuations/pronoun-inflections.tsv \
 			continuations/symbol-inflections.tsv \
 			continuations/verb-inflections.tsv
+
+if WANT_OLDFINNISH
+INFLECTIONS+=continuations/noun-inflections-arc.tsv
+endif
+
 
 # }}}
 #
