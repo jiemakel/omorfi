@@ -606,7 +606,7 @@ def format_wordmap_lexc_omor(wordmap, format):
         else:
             wordmap['analysis'] += format_stuff_omor('PROPER', format)
 
-    if '+semantics' in format and wordmap['sem']:
+    if '+semantics' in format and wordmap['sem']!='[]':
         for sem in wordmap['sem'].split(','):
             wordmap['analysis'] += format_stuff_omor(sem, format)
 
