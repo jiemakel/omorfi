@@ -57,7 +57,7 @@ AM_CONDITIONAL([WANT_GIELLA], [test "x$enable_giella" = xyes])
 
 AC_ARG_ENABLE([extras],
             [AS_HELP_STRING([--enable-extras],
-            [enable extra features (from +propers+semantics+ktnkav+newparas+taggerhacks+segments+oldfinnish) @<:@default=no extras@:>@])],
+            [enable extra features (from +propers+semantics+ktnkav+newparas+taggerhacks+segments+oldfinnish+dehyphenate) @<:@default=no extras@:>@])],
             [with_extras=$enableval],
             [with_extras=])
 AC_SUBST([EXTRAS], [$with_extras])
@@ -278,6 +278,7 @@ Configured $PACKAGE_STRING:
     * FTB3.1 $enable_ftb3
     * apertium $enable_apertium
     * giella: $enable_giella
+* Extras: $with_extras
 * Voikko speller: $enable_voikko
 * 
     * run tests on PBS cluster: $QSUB → mailto: $with_pbs_mail
