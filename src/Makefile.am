@@ -308,13 +308,13 @@ generated/omorfi-omor-tests.yaml: $(top_srcdir)/test/gtd-tests.tsv
 	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=omor -v
 
 generated/omorfi-omor.reweight: 
-	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=omor -o $@
+	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=omor$(EXTRAS) -o $@
 
 generated/omorfi-omor.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
 	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
 		-p generated/stemparts.tsv \
-		-i generated/inflections.tsv -o $@ -f=omor
+		-i generated/inflections.tsv -o $@ -f=omor$(EXTRAS)
 
 generated/omorfi-omor-rewrite-tags.regex:
 	$(PYTHON) $(srcdir)/python/generate-regexes.py -f=omor \

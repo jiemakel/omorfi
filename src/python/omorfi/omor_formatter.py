@@ -27,6 +27,7 @@ from .error_logging import fail_formatting_missing_for
 
 omor_multichars = {
         '[WORD_ID=',
+        '[SEGMENT=',
         '[UPOS=ADJ]',
         '[UPOS=VERB]',
         '[UPOS=NOUN]',
@@ -555,8 +556,23 @@ def format_continuation_lexc_omor(anals, surf, cont, format):
         anals = anals + '|Xnom'
     
     tags = anals.split('|')
-    for tag in tags:
-        omorstring += format_stuff_omor(tag, format)
+    if '+segments' in format:
+        morphs = surf.split('>')
+        if len(morphs) == len(tags):
+            for i in range(len(tags)):
+                if morphs[i] != '' and morphs[i] != '0':
+                    omorstring += '[SEGMENT=' + lexc_escape(morphs[i]) + ']'
+                    omorstring += format_stuff_omor(tags[i], format)
+        else:
+            for morph in morphs:
+                if morph != '' and morph != '0':
+                    omorstring += '[SEGMENT=' + lexc_escape(morph) + ']'
+            for tag in tags:
+                omorstring += format_stuff_omor(tag, format)
+    else:
+        for tag in tags:
+            omorstring += format_stuff_omor(tag, format)
+
     surf = lexc_escape(surf)
     return "%s:%s\t%s ;\n" %(omorstring, surf, cont)
 
@@ -623,6 +639,8 @@ def format_wordmap_lexc_omor(wordmap, format):
         for new_para in wordmap['new_paras']:
             wordmap['analysis'] += "[NEWPARA=%s]" %(new_para)
 
+    if '+segments' in format:
+        wordmap['analysis'] += "[SEGMENT=%s]" %(wordmap['stub'])
     # match WORD_ID= with epsilon, then stub and lemma might match
     lex_stub = '0' + wordmap['stub']
     retvals = []
