@@ -34,11 +34,14 @@ def format_rules_regex(format, ruleset):
                     ' | ' + twolc_escape(p[0]) + ' | '
         if '+oldfinnish' in format:
             regexstring += 'v:w::1 | {ks}:x::1 | {ts}:z::1 | '
-        regexstring += '? ]* (['
+        regexstring += '? ]* ' 
         if '+oldfinnish' in format:
+            regexstring += '(['
             for v in fin_vowels:
                 regexstring += v + ' | '
             regexstring = regexstring[:-3] + ' ] 0:\'::1) ;'
+        else:
+            regexstring += ';'
     elif ruleset == 'zh':
         regexstring += '[ ž | ž:z 0:h | ž:z::1 ] ;'
     elif ruleset == 'sh':
