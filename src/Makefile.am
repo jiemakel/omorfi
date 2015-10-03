@@ -8,7 +8,7 @@ voikkosharedir=$(libdir)/voikko/3/
 # Origins
 XML_SRCS=externals/kotus-sanalista_v1.xml externals/joukahainen.xml
 # Lexicography
-# 
+#
 LEXEMES=lexemes.tsv
 # lexical features
 LEMMA_JOINS=attributes/adjective-classes.tsv \
@@ -47,7 +47,7 @@ endif
 
 # }}}
 #
-# {{{Scripts 
+# {{{Scripts
 # NB: (variable name = SCIRPTS cause automagic _SCRIPTS)
 # tag formats
 FORMAT_SCIRPTS=python/omorfi/apertium_formatter.py \
@@ -100,10 +100,11 @@ GENERIC_GENERATED=generated/omorfi-uppercase-any.twolc \
 				  generated/omorfi-uppercase-first.twolc \
 				  generated/omorfi-recase-any.twolc \
 				  generated/omorfi-phon.twolc \
-				  generated/omorfi-orthographic-variations-arc.twolc \
+				  generated/omorfi-orthographic-variations.twolc \
 				  generated/omorfi-zh.regex \
 				  generated/omorfi-sh.regex \
 				  generated/omorfi-orthographic-variations.regex \
+					generated/omorfi-orthographic-variations.twolc \
 				  generated/omorfi-remove-boundaries.regex
 				  generated/omorfi-hyphens.twolc \
 				  generated/omorfi-between-tokens.regex.hfst \
@@ -266,8 +267,8 @@ generated/omorfi-uppercase-first.twolc: generated/timestamp
 generated/omorfi-hyphens.twolc: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r hyphens -o $@
 
-generated/omorfi-orthographic-variations-arc.twolc: generated/timestamp
-	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r orthographic-arc -o $@
+generated/omorfi-orthographic-variations.twolc: generated/timestamp
+	$(PYTHON) $(srcdir)/python/generate-twolcs.py -f=generic$(EXTRAS) -r orthographic -o $@
 
 generated/omorfi-orthographic-variations.regex: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-regexes.py \
@@ -300,14 +301,14 @@ generated/omorfi-token-separator.regex:
 generated/omorfi-hyphenate.twolc:
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -f=ftb3 -r hyphenate -o $@
 
-generated/omorfi-boundary.reweight: 
+generated/omorfi-boundary.reweight:
 	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=boundary -o $@
 
-# database to omor 
+# database to omor
 generated/omorfi-omor-tests.yaml: $(top_srcdir)/test/gtd-tests.tsv
 	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=omor -v
 
-generated/omorfi-omor.reweight: 
+generated/omorfi-omor.reweight:
 	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=omor$(EXTRAS) -o $@
 
 generated/omorfi-omor.lexc: generated/master.tsv generated/stemparts.tsv \
@@ -320,7 +321,7 @@ generated/omorfi-omor-rewrite-tags.regex:
 	$(PYTHON) $(srcdir)/python/generate-regexes.py -f=omor \
 		-r rewrite-tags -o $@
 
-# database to ftb3 
+# database to ftb3
 generated/omorfi-ftb3-tests.yaml: $(top_srcdir)/test/gtd-tests.tsv
 	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=ftb3 -v
 
@@ -402,24 +403,21 @@ generated/temporary.hyphenated.hfst: generated/omorfi.lexc.hfst \
 
 generated/temporary.boundary-weights.hfst: generated/temporary.hyphenated.hfst \
 		generated/omorfi-boundary.reweight
-	$(HREW) -T generated/omorfi-boundary.reweight $< -o $@ 
+	$(HREW) -T generated/omorfi-boundary.reweight $< -o $@
 
-generated/omorfi-orthographic-variations-arc.hfst: generated/omorfi-orthographic-variations.regex.hfst \
-	generated/omorfi-orthographic-variations-arc.twolc.hfst
-	$(HIC) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations-arc.twolc.hfst -o $@
-
-if WANT_OLDFINNISH
-ORTHOGRAPHIC_VARIATIONS=generated/omorfi-orthographic-variations-arc.hfst
-else
-ORTHOGRAPHIC_VARIATIONS=generated/omorfi-orthographic-variations.regex.hfst
-endif
+generated/omorfi-orthographic-variations.hfst: generated/omorfi-orthographic-variations.regex.hfst \
+	generated/omorfi-orthographic-variations.twolc.hfst
+	$(HSPL) $(HFST_FLAGS) generated/omorfi-orthographic-variations.twolc.hfst --prefix generated/omorfi-orthographic-variations-
+	$(HIX) $(HFST_FLAGS) generated/omorfi-orthographic-variations-1.hfst generated/omorfi-orthographic-variations-2.hfst |\
+	$(HIX) $(HFST_FLAGS) - generated/omorfi-orthographic-variations-3.hfst |\
+	$(HCOMP) $(HFST_FLAGS) -1 - -2 $< -o $@
 
 # spelling variations
 generated/temporary.relaxed.hfst: generated/temporary.boundary-weights.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	$(ORTHOGRAPHIC_VARIATIONS)
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
+	generated/omorfi-orthographic-variations.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.hfst |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
@@ -442,7 +440,7 @@ generated/omorfi.lemmatise.hfst: generated/temporary.ftb3.hfst generated/omorfi-
 	$(HCOMP) $(HFST_FLAGS) $< generated/omorfi-ftb3-lemmatise.regex.hfst |\
 		$(HF2F) -f olw -o $@
 
-# 
+#
 generated/omorfi.segment.hfst: generated/temporary.unbounded.hfst
 	$(HINV) $< | $(HF2F) -f olw -o $@
 
@@ -496,8 +494,8 @@ generated/temporary-ftb3.hyphenated.hfst: generated/omorfi-ftb3.lexc.hfst \
 generated/temporary-ftb3.relaxed.hfst: generated/temporary-ftb3.hyphenated.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	$(ORTHOGRAPHIC_VARIATIONS)
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
+	generated/omorfi-orthographic-variations.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.hfst |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
@@ -559,7 +557,7 @@ generated/omorfi-ftb3.generate.hfst: generated/temporary-ftb3.hyphenated.hfst \
 # This Makefile was tested using Omorfi revision
 # 20141014-213-g12c4345.
 #
-# Differences between regular Omorfi and the ftb1 version: 
+# Differences between regular Omorfi and the ftb1 version:
 #
 # - Ftb1 uses a different label set than Omorfi.
 #
@@ -1032,8 +1030,8 @@ generated/temporary-omor.hyphenated.hfst: generated/omorfi-omor.lexc.hfst \
 generated/temporary-omor.relaxed.hfst: generated/temporary-omor.hyphenated.hfst \
 	generated/omorfi-sh.regex.hfst \
 	generated/omorfi-zh.regex.hfst \
-	$(ORTHOGRAPHIC_VARIATIONS)
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 $(ORTHOGRAPHIC_VARIATIONS) |\
+	generated/omorfi-orthographic-variations.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.hfst |\
 		$(HMIN) $(HFST_FLAGS) |\
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
