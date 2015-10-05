@@ -556,7 +556,7 @@ def format_continuation_lexc_omor(anals, surf, cont, format):
         anals = anals + '|Xnom'
     
     tags = anals.split('|')
-    if '+segments' in format:
+    if '+segments' in format and (not 'DIGITS_' in cont or ('BACK' in cont or 'FRONT' in cont)):
         morphs = surf.split('>')
         if len(morphs) == len(tags):
             for i in range(len(tags)):
