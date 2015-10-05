@@ -537,8 +537,13 @@ generated/omorfi-ftb3.analyse.hfst: generated/temporary.ftb3.hfst
 
 # create generator from analyzer
 generated/omorfi-ftb3.generate.hfst: generated/temporary-ftb3.hyphenated.hfst \
+	generated/omorfi-ftb3-rewrite-tags.regex.hfst \
 	generated/omorfi-remove-boundaries.regex.hfst
-	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-remove-boundaries.regex.hfst |\
+	cat $< |\
+		$(HINV) $(HFST_FLAGS) |\
+		$(HCOMP) $(HFST_FLAGS) -2 generated/omorfi-ftb3-rewrite-tags.regex.hfst |\
+		$(HINV) $(HFST_FLAGS) |\
+		$(HCOMP) $(HFST_FLAGS) -1 - -2 generated/omorfi-remove-boundaries.regex.hfst |\
 		$(HF2F) $(HFST_FLAGS) -f olw  -o $@
 
 # }}}
@@ -1036,8 +1041,14 @@ generated/temporary-omor.relaxed.hfst: generated/temporary-omor.hyphenated.hfst 
 		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
 		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
 
+# case variations
+generated/temporary-omor.orth.hfst: generated/temporary-omor.relaxed.hfst \
+	generated/omorfi-uppercase-first.twolc.hfst
+	$(HIC) $(HFST_FLAGS) -1 $< -2 generated/omorfi-uppercase-first.twolc.hfst |\
+		$(HMIN) $(HFST_FLAGS) -o $@
+
 # remove remaining morph boundaries at this point
-generated/temporary-omor.unbounded.hfst: generated/temporary-omor.relaxed.hfst |\
+generated/temporary-omor.unbounded.hfst: generated/temporary-omor.orth.hfst |\
 	generated/omorfi-remove-boundaries.regex.hfst
 	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-remove-boundaries.regex.hfst  |\
 		$(HMIN) $(HFST_FLAGS) > $@
