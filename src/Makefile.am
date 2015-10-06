@@ -10,6 +10,11 @@ XML_SRCS=externals/kotus-sanalista_v1.xml externals/joukahainen.xml
 # Lexicography
 #
 LEXEMES=lexemes.tsv
+
+if WANT_OLDFINNISH
+LEXEMES+=lexemes-arc.tsv
+endif
+
 # lexical features
 LEMMA_JOINS=attributes/adjective-classes.tsv \
 			attributes/boundaries.tsv \
@@ -215,8 +220,15 @@ generated/timestamp:
 	touch $@
 
 # database to database
-generated/joint.tsv: lexemes.tsv $(LEMMA_JOINS) generated/timestamp
-	$(PYTHON) $(srcdir)/python/tsvjoin.py -v -i $< \
+
+if WANT_OLDFINNISH
+LEXEMES_TO_JOIN=-i lexemes.tsv -i lexemes-arc.tsv
+else
+LEXEMES_TO_JOIN=-i lexemes.tsv
+endif
+
+generated/joint.tsv: $(LEXEMES) $(LEMMA_JOINS) generated/timestamp
+	$(PYTHON) $(srcdir)/python/tsvjoin.py -v $(LEXEMES_TO_JOIN) \
 		-j $(srcdir)/attributes/adjective-classes.tsv \
 		-j $(srcdir)/attributes/boundaries.tsv \
 		-j $(srcdir)/attributes/noun-classes.tsv \
