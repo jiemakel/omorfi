@@ -33,7 +33,7 @@ def format_rules_regex(format, ruleset):
             regexstring += twolc_escape(p[0]) + ':' + twolc_escape(p[1]) + \
                     ' | ' + twolc_escape(p[0]) + ' | '
         if '+oldfinnish' in format:
-            regexstring += 'v:w::1 | {ks}:x::1 | {ts}:z::1 | '
+            regexstring += 'v:w::1 | {ks}:x::1 | {ts}:z::1 | {mp}:{mb}::1 | {nt}:{nd}::1 | {lt}:{ld}::1 | '
         regexstring += '? ]* ' 
         if '+oldfinnish' in format:
             regexstring += '(['

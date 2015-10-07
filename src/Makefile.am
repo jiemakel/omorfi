@@ -46,7 +46,7 @@ endif
 INFLECTIONS=continuations/inflections.tsv
 
 if WANT_OLDFINNISH
-INFLECTIONS+=continuations/inflections-arc.tsv
+INFLECTIONS+=continuations/derivations-arc.tsv continuations/inflections-arc.tsv
 endif
 
 
