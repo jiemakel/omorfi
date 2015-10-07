@@ -60,3 +60,11 @@ test/gutenberg-coverage.sh
 test/jrc-acquis-coverage.sh
 test/speed-test.sh
 test/test-header.yaml
+*~
+README
+src/bash/omorfi-*.sh
+test/coverage-*.sh
+test/coverages-all-quick.sh
+test/faithfulness-*.sh
+src/generated
+src/voikko/index.xml
