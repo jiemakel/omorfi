@@ -16,19 +16,21 @@ LEXEMES+=lexemes-arc.tsv
 endif
 
 # lexical features
-LEMMA_JOINS=attributes/adjective-classes.tsv \
+LEMMA_JOINS=attributes/abbr.tsv \
 			attributes/boundaries.tsv \
-			attributes/noun-classes.tsv \
-			attributes/numeral-classes.tsv \
+			attributes/broken-paradigms.tsv \
+			attributes/clitics.tsv \
+			attributes/lexicalised-inflection.tsv \
+			attributes/numtype.tsv \
+			attributes/particle-classes.tsv \
 			attributes/plurale-tantum.tsv \
 			attributes/possessives.tsv \
+			attributes/prontype.tsv \
 			attributes/pronunciation.tsv \
 			attributes/proper-classes.tsv \
-			attributes/particle-classes.tsv \
-			attributes/pronoun-classes.tsv \
-			attributes/symbol-classes.tsv \
 			attributes/semantic.tsv \
-			attributes/usage.tsv \
+			attributes/style.tsv \
+			attributes/symbol-classes.tsv \
 			attributes/verb-arguments.tsv
 # paradigm features
 PARADIGM_JOINS=paradigms/morphophonology.tsv \
@@ -229,21 +231,19 @@ endif
 
 generated/joint.tsv: $(LEXEMES) $(LEMMA_JOINS) generated/timestamp
 	$(PYTHON) $(srcdir)/python/tsvjoin.py -v $(LEXEMES_TO_JOIN) \
-		-j $(srcdir)/attributes/adjective-classes.tsv \
+		-j $(srcdir)/attributes/abbr.tsv \
 		-j $(srcdir)/attributes/boundaries.tsv \
-		-j $(srcdir)/attributes/noun-classes.tsv \
-		-j $(srcdir)/attributes/numeral-classes.tsv \
+		-j $(srcdir)/attributes/broken-paradigms.tsv \
+		-j $(srcdir)/attributes/lexicalised-inflection.tsv \
 		-j $(srcdir)/attributes/plurale-tantum.tsv \
-		-j $(srcdir)/attributes/possessives.tsv \
+		-j $(srcdir)/attributes/prontype.tsv \
 		-j $(srcdir)/attributes/pronunciation.tsv \
-		-j $(srcdir)/attributes/particle-classes.tsv \
 		-j $(srcdir)/attributes/proper-classes.tsv \
-		-j $(srcdir)/attributes/pronoun-classes.tsv \
 		-j $(srcdir)/attributes/semantic.tsv \
 		-j $(srcdir)/attributes/symbol-classes.tsv \
-		-j $(srcdir)/attributes/usage.tsv \
+		-j $(srcdir)/attributes/style.tsv \
 		-j $(srcdir)/attributes/verb-arguments.tsv -o $@
-
+# 
 generated/master.tsv: generated/joint.tsv
 	$(PYTHON) $(srcdir)/python/tsv_expand.py \
 		-j $(srcdir)/paradigms/morphophonology.tsv \
