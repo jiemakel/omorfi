@@ -133,6 +133,11 @@ if WANT_OMOR
 OMOR_AUTOMATA=generated/omorfi-omor.analyse.hfst \
 			  generated/omorfi-omor_recased.analyse.hfst \
 			  generated/omorfi-omor.generate.hfst
+
+if CAN_GUESS
+OMOR_AUTOMATA+=generated/omorfi-omor.analyse.guess.hfst
+endif
+
 OMOR_GENERATED=generated/omorfi-omor.lexc \
 			   generated/omorfi-omor.reweight \
 			   generated/omorfi-omor-tests.yaml \
@@ -1096,6 +1101,27 @@ generated/omorfi-omor_recased.analyse.hfst: generated/temporary.omor.hfst genera
 generated/omorfi-omor.generate.hfst: generated/temporary-omor.hyphenated.hfst  generated/omorfi-remove-boundaries.regex.hfst
 	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-remove-boundaries.regex.hfst |\
 		$(HF2F) $(HFST_FLAGS) -f olw -o $@
+
+# guesser
+
+generated/decl_substitutions.regex: generated/temporary.omor.hfst
+	hfst-summarize -v $< | \
+	grep -A1 "sigma set:" | \
+	tail -1 | \
+	sed 's/, /\n/g' | grep "\[KTN=" | \
+	sed 's/\[KTN=\(.*\)/&\t[GUESS_CATEGORY=\1/' > $@
+
+generated/temporary.omor.subst.hfst: generated/temporary.omor.hfst generated/decl_substitutions.regex
+	$(HSUB) -F generated/decl_substitutions.regex -o $@ $<
+
+generated/temporary.omor.subst.nocompounds.hfst: generated/temporary.omor.subst.hfst
+	echo "[ ? - %[BOUNDARY%=COMPOUND%] ]*" | hfst-regexp2fst > generated/filter_compounds.regex.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/filter_compounds.regex.hfst | \
+	$(HMIN) $(HFST_FLAGS) -o $@
+
+generated/omorfi-omor.analyse.guess.hfst: generated/temporary.omor.subst.nocompounds.hfst 
+	hfst-guessify $(HFST_FLAGS) $< | \
+	$(HF2F) $(HFST_FLAGS) -f olw -o $@
 
 # }}}
 #

@@ -32,7 +32,8 @@ from .ftb3_formatter import format_stuff_ftb3, \
         format_wordmap_lexc_ftb3, format_multichars_lexc_ftb3
 from .omor_formatter import format_stuff_omor, \
         format_analysis_lexc_omor, format_continuation_lexc_omor, \
-        format_wordmap_lexc_omor, format_multichars_lexc_omor
+        format_wordmap_lexc_omor, format_multichars_lexc_omor, \
+        ktnkav_multichars 
 from .giella_formatter import format_stuff_giella, \
         format_analysis_lexc_giella, format_continuation_lexc_giella, \
         format_wordmap_lexc_giella, format_multichars_lexc_giella

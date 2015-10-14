@@ -64,6 +64,8 @@ AC_SUBST([EXTRAS], [$with_extras])
 
 AM_CONDITIONAL([WANT_OLDFINNISH], [test "x$with_extras" != x${with_extras/+oldfinnish/}])
 
+AM_CONDITIONAL([CAN_GUESS], [test "x$with_extras" != x${with_extras/+ktnkav/}])
+
 AC_ARG_WITH([pbs-mail],
             [AS_HELP_STRING([set email for pbs job @<:@default=disable pbs@:>@])],
             [with_pbs_mail=$withval],
