@@ -36,7 +36,7 @@ def format_rules_regex(format, ruleset):
             regexstring += 'v:w::1 | {ks}:x::1 | {ts}:z::1 | {mp}:{mb}::1 | {nt}:{nd}::1 | {lt}:{ld}::1 | '
         regexstring += '? ]* ' 
         if '+oldfinnish' in format:
-            regexstring += '(['
+            regexstring += '(0:i::1) (['
             for v in fin_vowels:
                 regexstring += v + ' | '
             regexstring = regexstring[:-3] + ' ] 0:\'::1) ;'
