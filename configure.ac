@@ -32,9 +32,9 @@ AC_ARG_ENABLE([ftb1],
 AM_CONDITIONAL([WANT_FTB1], [test "x$enable_ftb1" = xyes])
 AC_ARG_ENABLE([ftb3],
               [AS_HELP_STRING([--enable-ftb3],
-                              [generate ftb3 automata @<:@default=enable@:>@])],
+                              [generate ftb3 automata @<:@default=disable@:>@])],
                              [enable_ftb3=$enableval],
-                             [enable_ftb3=yes])
+                             [enable_ftb3=no])
 AM_CONDITIONAL([WANT_FTB3], [test "x$enable_ftb3" = xyes])
 AC_ARG_ENABLE([omor],
               [AS_HELP_STRING([--enable-omor],
@@ -46,14 +46,20 @@ AC_ARG_ENABLE([apertium],
               [AS_HELP_STRING([--enable-apertium],
                               [generate apertium automata @<:@default=enable@:>@])],
                              [enable_apertium=$enableval],
-                             [enable_apertium=yes])
+                             [enable_apertium=no])
 AM_CONDITIONAL([WANT_APERTIUM], [test "x$enable_apertium" = xyes])
 AC_ARG_ENABLE([giella],
               [AS_HELP_STRING([--enable-giella],
-                              [generate giella automata @<:@default=enable@:>@])],
+                              [generate giella automata @<:@default=disable@:>@])],
                              [enable_giella=$enableval],
-                             [enable_giella=yes])
+                             [enable_giella=no])
 AM_CONDITIONAL([WANT_GIELLA], [test "x$enable_giella" = xyes])
+AC_ARG_ENABLE([labeled_segments],
+              [AS_HELP_STRING([--enable-labeled-segments],
+                              [generate labeled segmenter @<:@default=disable@:>@])],
+                             [enable_labeled_segments=$enableval],
+                             [enable_labeled_segments=no])
+AM_CONDITIONAL([WANT_LABELED_SEGMENTS], [test "x$enable_labeled_segments" = xyes])
 
 AC_ARG_ENABLE([extras],
             [AS_HELP_STRING([--enable-extras],
@@ -66,6 +72,28 @@ AM_CONDITIONAL([WANT_OLDFINNISH], [test "x$with_extras" != x${with_extras/+oldfi
 
 AM_CONDITIONAL([CAN_GUESS], [test "x$with_extras" != x${with_extras/+ktnkav/}])
 
+# applications
+# segmenter currently based on FTB 3
+AC_ARG_ENABLE([lemmatiser],
+              [AS_HELP_STRING([--enable-lemmatiser],
+                              [generate lemmatiser @<:@default=disable@:>@])],
+                             [enable_lemmatiser=$enableval],
+                             [enable_lemmatiser=no])
+AM_CONDITIONAL([WANT_LEMMATISE], [test "x$enable_ftb3" != xno -a x$enable_lemmatiser != xno])
+AC_ARG_ENABLE([segmenter],
+              [AS_HELP_STRING([--enable-segmenter],
+                              [generate segmenter @<:@default=disable@:>@])],
+                             [enable_segmenter=$enableval],
+                             [enable_segmenter=no])
+AM_CONDITIONAL([WANT_SEGMENTS], [test "x$enable_ftb3" != xno -a x$enable_segmenter != xno])
+AC_ARG_ENABLE([hyphenator],
+              [AS_HELP_STRING([--enable-hyphenator],
+                              [generate hyphenator @<:@default=disable@:>@])],
+                             [enable_hyphenator=$enableval],
+                             [enable_hyphenator=no])
+AM_CONDITIONAL([WANT_HYPHENATE], [test x$enable_hyphenator != xno])
+
+# run some things on clusters
 AC_ARG_WITH([pbs-mail],
             [AS_HELP_STRING([set email for pbs job @<:@default=disable pbs@:>@])],
             [with_pbs_mail=$withval],
@@ -82,7 +110,6 @@ AC_ARG_ENABLE([big-tests],
                              [big_tests=$enableval],
                              [big_tests=no])
 AM_CONDITIONAL([WANT_BIG_TESTS], [test "x$big_tests" != xno])
-
 # hum dee dum
 AC_MSG_CHECKING([if plans for world domination have succeeded yet])
 AC_MSG_RESULT([40 seconds to mars])
@@ -281,12 +308,19 @@ Configured $PACKAGE_STRING:
     * FTB3.1 $enable_ftb3
     * apertium $enable_apertium
     * giella: $enable_giella
+    * labeled segmenter: $enable_labeled_segments
 * Extras: $with_extras
-* Voikko speller: $enable_voikko
+* Applications
+    * Voikko speller: $enable_voikko
+    * segmenter: $enable_segmenter
+    * lemmatiser: $enable_lemmatise
+    * hyphenators: $enable_hyphenator
 * 
     * run tests on PBS cluster: $QSUB → mailto: $with_pbs_mail
     * run tests on SLURM cluster: $SBATCH → mailto: $with_slurm_mail
 EOF
 AS_IF([test x$TIME = xfalse], [AC_MSG_WARN([GNU time is missing, tests will fail])])
 AS_IF([test x$PYTHON = x:], [AC_MSG_WARN([python3 is required for lexical database use])])
+AS_IF([test x$enable_segmenter != xno -a x$enable_ftb3 = xno], [AC_MSG_WARN([Dosabled segmenter since disabled FTB3])])
+AS_IF([test x$enable_lemmatiser != xno -a x$enable_ftb3 = xno], [AC_MSG_WARN([Dosabled lemmatiser since disabled FTB3])])
 $THEREARENOEASTEREGGS say make, make check and make install to proceed

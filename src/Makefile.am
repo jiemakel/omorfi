@@ -97,11 +97,17 @@ SCIRPTS=$(FORMAT_SCIRPTS) $(GENERATOR_SCIRPTS) $(DATABASE_SCIRPTS) \
 # {{{Generated files
 if WANT_HFST
 GENERIC_AUTOMATA=generated/omorfi.accept.hfst \
-				 generated/omorfi.lemmatise.hfst \
-				 generated/omorfi.tokenise.hfst \
-				 generated/omorfi.segment.hfst \
-				 generated/omorfi.hyphenate-rules.hfst
+				 generated/omorfi.tokenise.hfst
+if WANT_LEMMATISE
+GENERIC_AUTOMATA+=generated/omorfi.lemmatise.hfst
+endif
+if WANT_SEGMENTS
+GENERIC_AUTOMATA+=generated/omorfi.segment.hfst
+endif
+if WANT_HYPHENATE
+GENERIC_AUTOMATA+=generated/omorfi.hyphenate-rules.hfst
 # hyphenate-dict is unusable atm
+endif
 GENERIC_GENERATED=generated/omorfi-uppercase-any.twolc \
 				  generated/omorfi-uppercase-first.twolc \
 				  generated/omorfi-recase-any.twolc \
@@ -161,9 +167,13 @@ GIELLA_GENERATED=generated/omorfi-giella.lexc \
 				 generated/omorfi-giella.reweight
 
 endif
-DB_GENERATED=generated/master.tsv generated/joint.tsv
+if WANT_LABELED_SEGMENTS
+LABELSEGMENT_AUTOMATA=generated/omorfi-labelsegments.analyse.hfst
+LABELSEGMENT_GENERATED=generated/omorfi-labelsegments.lexc
+endif
 
 endif # HFST
+DB_GENERATED=generated/master.tsv generated/joint.tsv
 if CAN_VISLCG3
 VISLCG3_GENERATED=generated/omorfi.cg3bin
 endif
@@ -172,7 +182,7 @@ endif
 # destnations directories for this stuff at the top of the file
 pkgdata_DATA=$(GENERIC_AUTOMATA) $(FTB3_AUTOMATA) $(OMOR_AUTOMATA) \
 				$(APE_AUTOMATA) $(VISLCG3_GENERATED) \
-				$(FTB1_AUTOMATA)
+				$(FTB1_AUTOMATA) $(LABELSEGMENT_AUTOMATA)
 voikkoshare_DATA=voikko/speller-omorfi.zhfst
 pkgdata_DATA+=generated/master.tsv
 
@@ -269,6 +279,13 @@ generated/omorfi.lexc: generated/master.tsv generated/stemparts.tsv \
 	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
 		-i generated/inflections.tsv -o $@ -f=generic$(EXTRAS)
 
+# segmented analysis experiment
+generated/omorfi-labelsegments.lexc: generated/master.tsv generated/stemparts.tsv \
+	generated/inflections.tsv
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
+		-i generated/inflections.tsv -o $@ -f=labeled
+
+# 
 generated/omorfi-phon.twolc: generated/timestamp
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -r phon -o $@
 
@@ -499,6 +516,47 @@ generated/omorfi.hyphenate-rules.hfst: generated/omorfi-hyphenate.twolc.hfst
 		$(HF2F) -f olw > $@
 
 # }}}
+#
+# {{{ GENERIC label segments
+# word-boundary huphens
+generated/temporary-labelsegments.hyphenated.hfst: generated/omorfi-labelsegments.lexc.hfst \
+	generated/omorfi-hyphens.twolc.hfst
+	$(HIC) $(HFST_FLAGS) -1 $< -2 generated/omorfi-hyphens.twolc.hfst |\
+		$(HMIN) $(HFST_FLAGS) -o $@
+
+generated/temporary-labelsegments.boundary-weights.hfst: generated/temporary-labelsegments.hyphenated.hfst \
+		generated/omorfi-boundary.reweight
+	$(HREW) -T generated/omorfi-boundary.reweight $< -o $@ 
+
+# spelling variations
+generated/temporary-labelsegments.relaxed.hfst: generated/temporary-labelsegments.boundary-weights.hfst \
+	generated/omorfi-sh.regex.hfst \
+	generated/omorfi-zh.regex.hfst \
+	generated/omorfi-orthographic-variations.regex.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-orthographic-variations.regex.hfst |\
+		$(HMIN) $(HFST_FLAGS) |\
+		$(HSUB) $(HFST_FLAGS) -f š -T generated/omorfi-sh.regex.hfst |\
+		$(HSUB) $(HFST_FLAGS) -f ž -T generated/omorfi-zh.regex.hfst -o $@
+
+# case variations
+generated/temporary-labelsegments.orth.hfst: generated/temporary-labelsegments.relaxed.hfst \
+	generated/omorfi-uppercase-first.twolc.hfst
+	$(HIC) $(HFST_FLAGS) -1 $< -2 generated/omorfi-uppercase-first.twolc.hfst |\
+		$(HMIN) $(HFST_FLAGS) -o $@
+
+# remove remaining morph boundaries at this point
+generated/temporary-labelsegments.unbounded.hfst: generated/temporary-labelsegments.orth.hfst |\
+	generated/omorfi-remove-boundaries.regex.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/omorfi-remove-boundaries.regex.hfst  |\
+		$(HMIN) $(HFST_FLAGS) > $@
+
+
+# 
+generated/omorfi-labelsegments.analyse.hfst: generated/temporary-labelsegments.unbounded.hfst
+	$(HINV) $< | $(HF2F) -f olw -o $@
+
+# }}}
+#
 # {{{FTB3 compilation
 
 # word-boundary huphens
