@@ -15,6 +15,10 @@ if WANT_OLDFINNISH
 LEXEMES+=lexemes-arc.tsv
 endif
 
+if WANT_COLLOQUIAL
+LEXEMES+=lexemes-col.tsv
+endif
+
 # lexical features
 LEMMA_JOINS=attributes/abbr.tsv \
 			attributes/boundaries.tsv \
@@ -43,6 +47,10 @@ if WANT_OLDFINNISH
 STEMPARTS+=continuations/stems-arc.tsv
 endif
 
+if WANT_COLLOQUIAL
+STEMPARTS+=continuations/stems-col.tsv
+endif
+
 # suffixes by concatenations
 INFLECTIONS=continuations/inflections.tsv
 
@@ -50,6 +58,9 @@ if WANT_OLDFINNISH
 INFLECTIONS+=continuations/derivations-arc.tsv continuations/inflections-arc.tsv
 endif
 
+if WANT_COLLOQUIAL
+INFLECTIONS+=continuations/derivations-col.tsv continuations/inflections-col.tsv
+endif
 
 # }}}
 #

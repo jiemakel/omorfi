@@ -84,7 +84,7 @@ def main():
     def FormatArgType(v):
         baseformats = ["omor", "apertium",
                 "giella", "ftb3", "generic", "google", "labeled"]
-        extras = ["propers", "semantics", "ktnkav", "newparas", "taggerhacks", "segments", "oldfinnish", "dehyphenate"]
+        extras = ["propers", "semantics", "ktnkav", "newparas", "taggerhacks", "segments", "oldfinnish", "colloquial", "dehyphenate"]
         parts = v.split('+')
         if parts[0] not in baseformats:
             raise argparse.ArgumentTypeError("Format must be one of: " + " ".join(baseformats))
