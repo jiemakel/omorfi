@@ -208,7 +208,7 @@ def analyse_tree(filename):
 
 def write_to_file(pos, entry):
     entry = fix_entry_name(entry)
-    with open("dictionary_"+pos+".txt", "a", encoding="utf-8") as f:
+    with open("cemf-dict/dictionary_"+pos+".txt", "a", encoding="utf-8") as f:
         f.write(entry+"\n")
 
 def fix_entry_name(entry):
@@ -222,17 +222,17 @@ def identify_pos(pos):
 def sort_and_tidy_files():
     files = ["A", "N", "V", "other"]
     for code in files:
-        with open("dictionary_"+code+".txt", "r", encoding="utf-8") as f:
+        with open("cemf-dict/dictionary_"+code+".txt", "r", encoding="utf-8") as f:
             lines = []
             for x in f.readlines():
                 if x not in lines: lines.append(x)
             lines.sort()
         
-        with open("dictionary_"+code+".txt", "w", encoding="utf-8") as f:
+        with open("cemf-dict/dictionary_"+code+".txt", "w", encoding="utf-8") as f:
             print(lines)
             f.writelines(lines)
             
-files = ["helenius.xml", "ahlman.xml", "renvall.xml", "europaeus.xml"]
+files = ["helenius.xml", "lexik1865.xml", "renvall.xml", "sanakirja1853.xml"]
 
-for x in files: analyse_tree(x)
+for x in files: analyse_tree("cemf-dict/"+x)
 sort_and_tidy_files()
