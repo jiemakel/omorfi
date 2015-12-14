@@ -57,6 +57,7 @@ class Omorfi:
     lemmatisers = dict()
     hyphenators = dict()
     segmenters = dict()
+    labelsegmenters = dict()
     acceptors = dict()
     can_lowercase = True
     can_titlecase = True
@@ -97,7 +98,7 @@ class Omorfi:
             include['segment'] = True
             include['accept'] = True
         for ttype in ['analyse', 'generate', 'accept', 'tokenise', 'lemmatise',
-                'hyphenate', 'segment']:
+                'hyphenate', 'segment', 'labelsegment']:
             if not ttype in include:
                 include[ttype] = False
         if this._verbosity:
@@ -141,6 +142,10 @@ class Omorfi:
             if this._verbosity:
                 print('segmenter', parts[0])
             this.segmenters[parts[0]] = trans
+        elif parts[1] == 'labelsegment' and include['labelsegment']:
+            if this._verbosity:
+                print('labelsegmenter', parts[0])
+            this.labelsegmenters[parts[0]] = trans
         elif this._verbosity:
             print('skipped', parts)
 
@@ -342,6 +347,25 @@ class Omorfi:
                 segment.weight = float('inf')
                 segments = [segment]
         return segments
+
+    def _labelsegment(this, token, automaton):
+        res = libhfst.detokenize_paths(this.labelsegmenters[automaton].lookup_fd(token))
+        return res
+
+    def labelsegment(this, token):
+        labelsegments = None
+        if 'default' in this.labelsegmenters:
+            labelsegments = this._labelsegment(token, 'default')
+        if not labelsegments and 'omorfi' in this.labelsegmenters:
+            labelsegments = this._labelsegment(token, 'omorfi')
+            if not labelsegments:
+                class FakeSegment():
+                    pass
+                labelsegment = FakeSegment()
+                labelsegment.output = token
+                labelsegment.weight = float('inf')
+                labelsegments = [labelsegment]
+        return labelsegments
 
     def _accept(this, token, automaton):
         res = libhfst.detokenize_paths(this.acceptors[automaton].lookup_fd(token))
