@@ -156,6 +156,7 @@ def analyse_tree(filename):
 
     entries = text.findall('entry')
     res = []
+    print(filename, len(entries))
     for child in entries:
 
         entry_name = child.find('form').find('orth').text
@@ -188,14 +189,14 @@ def analyse_tree(filename):
     try:
         text = text.find('div').find('p')
         entries = text.findall('s')
-
+        print(filename, len(entries))
         for entry in entries:
             text = re.sub("[\t\n]", "", entry.text)
-            entry_name = re.split("*", text)[0]
+            entry_name = re.split("\*", text)[0]
             entry_name = re.split(" ", entry_name)
             if len(entry_name) == 0:
                 entry_name = entry_name[0]
-                parts = re.split(" ", re.split("*", text)[1])
+                parts = re.split(" ", re.split("\*", text)[1])
                 for x in parts: 
                     if x in pos_replacements: pos = x
                 write_to_file(pos, entry_name)
@@ -208,7 +209,7 @@ def analyse_tree(filename):
 
 def write_to_file(pos, entry):
     entry = fix_entry_name(entry)
-    with open("cemf-dict/dictionary_"+pos+".txt", "a", encoding="utf-8") as f:
+    with open("dictionary_"+pos+".txt", "a", encoding="utf-8") as f:
         f.write(entry+"\n")
 
 def fix_entry_name(entry):
@@ -222,17 +223,17 @@ def identify_pos(pos):
 def sort_and_tidy_files():
     files = ["A", "N", "V", "other"]
     for code in files:
-        with open("cemf-dict/dictionary_"+code+".txt", "r", encoding="utf-8") as f:
+        with open("dictionary_"+code+".txt", "r", encoding="utf-8") as f:
             lines = []
             for x in f.readlines():
                 if x not in lines: lines.append(x)
             lines.sort()
         
-        with open("cemf-dict/dictionary_"+code+".txt", "w", encoding="utf-8") as f:
-            print(lines)
+        with open("dictionary_"+code+".txt", "w", encoding="utf-8") as f:
+#            print(lines)
             f.writelines(lines)
             
-files = ["helenius.xml", "lexik1865.xml", "renvall.xml", "sanakirja1853.xml"]
+files = ["helenius.xml", "ahlman.xml", "renvall.xml", "europaeus.xml"]
 
-for x in files: analyse_tree("cemf-dict/"+x)
+for x in files: analyse_tree(x)
 sort_and_tidy_files()
