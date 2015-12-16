@@ -31,9 +31,9 @@ pos_replacements = {
         "??prÃ¤."       : "other",
         "??a."          : "A",
         "pluralis" : "N",
-        "??f.pl." : "del", 
+        "??f.pl." : "del",
         "??v.defect." : "del",
-        "genuscommune" : "names", 
+        "genuscommune" : "names",
         "??s.pl." : "N",
         "??adj.comp." : "del",
         "conjunctio" : "other",
@@ -57,7 +57,7 @@ pos_replacements = {
         "??n.pl." : "N",
         "??ajd." : "A",
         "??pr." : "other",
-        "??pron.rel." : "P", 
+        "??pron.rel." : "P",
         "??prÃ¤p.adv." : "other",
         "??j." : "del",
         "??v.fr." : "V",
@@ -93,7 +93,7 @@ pos_replacements = {
         "??pron.pl." : "P",
         "indeclinabile" : "other",
         "??v..r" : "V",
-        "??(t.detpÃ¥)" : "V", 
+        "??(t.detpÃ¥)" : "V",
         "??num." : "NUM",
         "??uttr.imper." : "del",
         "adjektiivi" : "A",
@@ -162,26 +162,26 @@ def analyse_tree(filename):
         entry_name = child.find('form').find('orth').text
         entry_name = fix_entry_name(entry_name)
         if len(re.split(" ", entry_name)) == 1:
-        
+
             if child.find('gramGrp') is not None:
                 if child.find('gramGrp').find('pos') is not None:
                     pos = child.find('gramGrp').find('pos').text
                 else:
                     pos = child.find('gramGrp').text
                 pos = re.sub("[\n\t ]", "", pos)
-                
+
             else:
                 pos = "unknown"
-            
+
 
             try:
                 pos_c = identify_pos(pos)
-            
+
             except:
                 KeyError
                 print("Key Error:"+pos+"   "+entry_name)
             try:
-                write_to_file(pos_c, entry_name)
+                write_to_file(filename, pos_c, entry_name)
             except:
                 UnboundLocalError
                 print(ET.tostring(child))
@@ -197,9 +197,9 @@ def analyse_tree(filename):
             if len(entry_name) == 0:
                 entry_name = entry_name[0]
                 parts = re.split(" ", re.split("\*", text)[1])
-                for x in parts: 
+                for x in parts:
                     if x in pos_replacements: pos = x
-                write_to_file(pos, entry_name)
+                write_to_file(filename, pos, entry_name)
     except:
         AttributeError
 
@@ -207,9 +207,9 @@ def analyse_tree(filename):
 
 
 
-def write_to_file(pos, entry):
+def write_to_file(filename, pos, entry):
     entry = fix_entry_name(entry)
-    with open("dictionary_"+pos+".txt", "a", encoding="utf-8") as f:
+    with open(filename+"_"+pos+".txt", "a", encoding="utf-8") as f:
         f.write(entry+"\n")
 
 def fix_entry_name(entry):
@@ -221,19 +221,22 @@ def identify_pos(pos):
     return pos_replacements[re.sub("[\t\n ]", "", pos)]
 
 def sort_and_tidy_files():
-    files = ["A", "N", "V", "other"]
-    for code in files:
-        with open("dictionary_"+code+".txt", "r", encoding="utf-8") as f:
-            lines = []
-            for x in f.readlines():
-                if x not in lines: lines.append(x)
-            lines.sort()
-        
-        with open("dictionary_"+code+".txt", "w", encoding="utf-8") as f:
-#            print(lines)
-            f.writelines(lines)
-            
-files = ["helenius.xml", "ahlman.xml", "renvall.xml", "europaeus.xml"]
+    pos = ["A", "N", "V", "other"]
+    for filename in files:
+        for code in pos:
+            try:
+                with open("cemf-dict/"+filename+"_"+code+".txt", "r", encoding="utf-8") as f:
+                    lines = []
+                    for x in f.readlines():
+                        if x not in lines: lines.append(x)
+                    lines.sort()
 
-for x in files: analyse_tree(x)
+                with open("cemf-dict/"+filename+"_"+code+".txt", "w", encoding="utf-8") as f:
+                    f.writelines(lines)
+            except:
+                print(filename+"_"+code+".txt empty")
+
+files = ["helenius.xml", "lexik1865.xml", "renvall.xml", "sanakirja1853.xml"]
+
+for x in files: analyse_tree("cemf-dict/"+x)
 sort_and_tidy_files()
