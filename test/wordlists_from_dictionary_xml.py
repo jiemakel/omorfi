@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import re
 import sys
+import glob
+import os
 
 pos_replacements = {
         "f."            : "N",
@@ -210,7 +212,7 @@ def analyse_tree(filename):
 def write_to_file(filename, pos, entry):
     entry = fix_entry_name(entry)
     with open(filename+"_"+pos+".txt", "a", encoding="utf-8") as f:
-        f.write(entry+"\n")
+        f.write("1 "+entry+"\n")
 
 def fix_entry_name(entry):
     entry = re.sub("[\]\[;/\n)(]", "", entry)
@@ -220,23 +222,13 @@ def fix_entry_name(entry):
 def identify_pos(pos):
     return pos_replacements[re.sub("[\t\n ]", "", pos)]
 
-def sort_and_tidy_files():
-    pos = ["A", "N", "V", "other"]
-    for filename in files:
-        for code in pos:
-            try:
-                with open("cemf-dict/"+filename+"_"+code+".txt", "r", encoding="utf-8") as f:
-                    lines = []
-                    for x in f.readlines():
-                        if x not in lines: lines.append(x)
-                    lines.sort()
-
-                with open("cemf-dict/"+filename+"_"+code+".txt", "w", encoding="utf-8") as f:
-                    f.writelines(lines)
-            except:
-                print(filename+"_"+code+".txt empty")
-
 files = ["helenius.xml", "lexik1865.xml", "renvall.xml", "sanakirja1853.xml"]
 
-for x in files: analyse_tree("cemf-dict/"+x)
-sort_and_tidy_files()
+def clean_files(filename):
+    for x in glob.glob(filename+"*.txt"):
+        print(x)
+        os.remove(x)
+
+for x in files:
+    clean_files("cemf-dict/"+x)
+    analyse_tree("cemf-dict/"+x)
