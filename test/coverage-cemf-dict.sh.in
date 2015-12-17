@@ -1,0 +1,28 @@
+#!/bin/bash
+# coverage for cemf-dict
+if test -z $srcdir ; then
+    echo invoke from make check or define srcdir=.
+    exit 1
+fi
+fsa="@top_builddir@/src/generated/omorfi-omor.analyse.hfst"
+cs="get-covered.bash"
+if ! test -r $fsa ; then
+    echo Unable to find built fsa for tests: $fsa
+fi
+if ! test -f $cuf ; then
+    echo missing corpus data $cuf, run $cs and retry
+    exit 77
+fi
+if ! test -x @PYTHON@ ; then
+    echo python missing, cannot run tests
+    exit 77
+fi
+code=0
+for f in cemf-dict/*.txt
+do
+    echo Looking up $f
+    if ! @PYTHON@ coverage.py -f $fsa -i $f -c 1 -o cemf-dict.coveragelog -t 60 ; then
+	code=1
+    fi
+done
+exit $code
