@@ -1,3 +1,20 @@
+# Modified version of Omorfi–Open morphology of Finnish
+
+Adds support for:
+ * automatic dehyphenation in analysers
+ * including segment information in OMOR analysis
+ * [early modern Finnish](README-EMF.md) (orthographical variation, inflection and lexicon)
+ * colloquial Finnish (inflection and lexicon)
+ * generating an OMOR lemma guesser
+
+To get all the treats, use the following flags in your configure -script:
+
+```
+./configure --enable-dehyphenation --enable-emf --enable-colloq --enable-omor --enable-omor-ktnkav --enable-omor-segments --enable-omor-guesser
+```
+
+Original README follows:
+
 # Omorfi–Open morphology of Finnish
 
 This is a free/libre open source morphology of Finnish: a database, tools and
