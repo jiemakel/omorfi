@@ -23,6 +23,81 @@ AC_ARG_ENABLE([voikko],
                               [enable_voikko=yes])
 AM_CONDITIONAL([WANT_VOIKKO], [test "x$enable_voikko" != xno])
 
+# global option switches
+AC_ARG_ENABLE([dehyphenation],
+              [AS_HELP_STRING([--enable-dehyphenation],
+                              [include dehyphenation support in analysers @<:@default=disable@:>@])],
+                              [enable_dehyphenation=$enableval],
+                              [enable_dehyphenation=no])
+AM_CONDITIONAL([WANT_DEHYP], [test "x$enable_dehyphenation" != xno])
+AC_ARG_ENABLE([emf],
+              [AS_HELP_STRING([--enable-emf],
+                              [include support for early modern Finnish @<:@default=disable@:>@])],
+                              [enable_emf=$enableval],
+                              [enable_emf=no])
+AM_CONDITIONAL([WANT_EMF], [test "x$enable_emf" != xno])
+AC_ARG_ENABLE([colloq],
+              [AS_HELP_STRING([--enable-colloq],
+                              [include support for colloquial Finnish @<:@default=disable@:>@])],
+                              [enable_colloq=$enableval],
+                              [enable_colloq=no])
+AM_CONDITIONAL([WANT_COLLOQ], [test "x$enable_colloq" != xno])
+
+# main tagset switches
+AC_ARG_ENABLE([omor],
+              [AS_HELP_STRING([--enable-omor],
+                              [generate omor automata @<:@default=enable@:>@])],
+                             [enable_omor=$enableval],
+                             [enable_omor=yes])
+AM_CONDITIONAL([WANT_OMOR], [test "x$enable_omor" = xyes])
+AC_ARG_ENABLE([omor_paradigms],
+              [AS_HELP_STRING([--enable-omor-paradigms],
+                              [include new_para feature in omors @<:@default=disable@:>@])],
+                              [enable_omor_paradigms=$enableval],
+                              [enable_omor_paradigms=no])
+AS_IF([test x$enable_omor_paradigms != xno],
+      [AC_SUBST([OMORPARAFLAG], ["--omor-new-para"])])
+AC_ARG_ENABLE([omor_allomorphs],
+              [AS_HELP_STRING([--enable-omor-allomorphs],
+                              [include allomorph feature in omors @<:@default=disable@:>@])],
+                              [enable_omor_allomorphs=$enableval],
+                              [enable_omor_allomorphs=no])
+AS_IF([test x$enable_omor_allomorphs != xno],
+      [AC_SUBST([OMORALLOFLAG], ["--omor-allo"])])
+AC_ARG_ENABLE([omor_proper_classes],
+              [AS_HELP_STRING([--enable-omor-proper-classes],
+                              [include proper feature in omors @<:@default=enable@:>@])],
+                              [enable_omor_proper_classes=$enableval],
+                              [enable_omor_proper_classes=yes])
+AS_IF([test enable_omor_proper_classes != xno],
+      [AC_SUBST([OMORPROPFLAG], ["--omor-props"])])
+AC_ARG_ENABLE([omor_semantics],
+              [AS_HELP_STRING([--enable-omor-semantics],
+                              [include sem feature in omors @<:@default=enable@:>@])],
+                              [enable_omor_semantics=$enableval],
+                              [enable_omor_semantics=yes])
+AS_IF([test x$enable_omor_semantics != xno],
+      [AC_SUBST([OMORSEMFLAG], ["--omor-sem"])])
+AC_ARG_ENABLE([omor_segments],
+              [AS_HELP_STRING([--enable-omor-segments],
+                              [include segmentation feature in omors @<:@default=disable@:>@])],
+                              [enable_omor_segments=$enableval],
+                              [enable_omor_segments=no])
+AS_IF([test x$enable_omor_segments != xno],
+      [AC_SUBST([OMORSEGMENTSFLAG], ["--omor-segments"])])
+AC_ARG_ENABLE([omor_ktnkav],
+              [AS_HELP_STRING([--enable-omor-ktnkav],
+                              [include kotus inflection/gradation class feature in omors (also enables guesser generation) @<:@default=disable@:>@])],
+                              [enable_omor_ktnkav=$enableval],
+                              [enable_omor_ktnkav=no])
+AS_IF([test x$enable_omor_ktnkav != xno],
+      [AC_SUBST([OMORKTNKAVFLAG], ["--omor-ktnkav"])])
+AC_ARG_ENABLE([omor_guesser],
+              [AS_HELP_STRING([--enable-omor-guesser],
+                              [generate omor guesser @<:@default=disable@:>@])],
+                              [enable_omor_guesser=$enableval],
+                              [enable_omor_guesser=no])
+AM_CONDITIONAL([WANT_GUESSER], [test "x$enable_omor_guesser" != xno])
 # generic tagset switch to override (for lexc serialisation)
 AC_ARG_ENABLE([ftb1],
               [AS_HELP_STRING([--enable-ftb1],
@@ -36,12 +111,6 @@ AC_ARG_ENABLE([ftb3],
                              [enable_ftb3=$enableval],
                              [enable_ftb3=no])
 AM_CONDITIONAL([WANT_FTB3], [test "x$enable_ftb3" = xyes])
-AC_ARG_ENABLE([omor],
-              [AS_HELP_STRING([--enable-omor],
-                              [generate omor automata @<:@default=enable@:>@])],
-                             [enable_omor=$enableval],
-                             [enable_omor=yes])
-AM_CONDITIONAL([WANT_OMOR], [test "x$enable_omor" = xyes])
 AC_ARG_ENABLE([apertium],
               [AS_HELP_STRING([--enable-apertium],
                               [generate apertium automata @<:@default=enable@:>@])],
@@ -61,33 +130,33 @@ AC_ARG_ENABLE([labeled_segments],
                              [enable_labeled_segments=no])
 AM_CONDITIONAL([WANT_LABELED_SEGMENTS], [test "x$enable_labeled_segments" = xyes])
 
-AC_ARG_ENABLE([extras],
-            [AS_HELP_STRING([--enable-extras],
-            [enable extra features (from +propers+semantics+ktnkav+newparas+taggerhacks+segments+oldfinnish+colloquial+dehyphenate) @<:@default=no extras@:>@])],
-            [with_extras=$enableval],
-            [with_extras=])
-AC_SUBST([EXTRAS], [$with_extras])
-
-AM_CONDITIONAL([WANT_OLDFINNISH], [test "x$with_extras" != x${with_extras/+oldfinnish/}])
-
-AM_CONDITIONAL([WANT_COLLOQUIAL], [test "x$with_extras" != x${with_extras/+colloquial/}])
-
-AM_CONDITIONAL([CAN_GUESS], [test "x$with_extras" != x${with_extras/+ktnkav/}])
 
 # applications
 # segmenter currently based on FTB 3
+AC_ARG_ENABLE([acceptor],
+              [AS_HELP_STRING([--enable-acceptor],
+                              [generate acceptor @<:@default=yes@:>@])],
+                              [enable_acceptor=$enableval],
+                              [enable_acceptor=yes])
+AM_CONDITIONAL([WANT_ACCEPTOR], [test x$enable_acceptor != xno])
+AC_ARG_ENABLE([tokeniser],
+              [AS_HELP_STRING([--enable-tokeniser],
+                              [generate tokeniser @<:@default=yes@:>@])],
+                              [enable_tokeniser=$enableval],
+                              [enable_tokeniser=yes])
+AM_CONDITIONAL([WANT_TOKENISER], [test x$enable_tokeniser != xno])
 AC_ARG_ENABLE([lemmatiser],
               [AS_HELP_STRING([--enable-lemmatiser],
                               [generate lemmatiser @<:@default=disable@:>@])],
                              [enable_lemmatiser=$enableval],
                              [enable_lemmatiser=no])
-AM_CONDITIONAL([WANT_LEMMATISE], [test "x$enable_ftb3" != xno -a x$enable_lemmatiser != xno])
+AM_CONDITIONAL([WANT_LEMMATISE], [test x$enable_lemmatiser != xno])
 AC_ARG_ENABLE([segmenter],
               [AS_HELP_STRING([--enable-segmenter],
                               [generate segmenter @<:@default=disable@:>@])],
                              [enable_segmenter=$enableval],
                              [enable_segmenter=no])
-AM_CONDITIONAL([WANT_SEGMENTS], [test "x$enable_ftb3" != xno -a x$enable_segmenter != xno])
+AM_CONDITIONAL([WANT_SEGMENTS], [test x$enable_segmenter != xno])
 AC_ARG_ENABLE([hyphenator],
               [AS_HELP_STRING([--enable-hyphenator],
                               [generate hyphenator @<:@default=disable@:>@])],
@@ -291,10 +360,18 @@ AC_CONFIG_FILES([test/coverage-jrc-acquis.sh],
                 [chmod +x test/coverage-jrc-acquis.sh])
 AC_CONFIG_FILES([test/coverage-ftb-3.1.sh],
                 [chmod +x test/coverage-ftb-3.1.sh])
+AC_CONFIG_FILES([test/coverage-fi-ud.sh],
+                [chmod +x test/coverage-fi-ud.sh])
+AC_CONFIG_FILES([test/coverage-fi-ftb-ud.sh],
+                [chmod +x test/coverage-fi-ftb-ud.sh])
 AC_CONFIG_FILES([test/faithfulness-ftb-3.1.sh],
                 [chmod +x test/faithfulness-ftb-3.1.sh])
 AC_CONFIG_FILES([test/faithfulness-ftb-3.1-quick.sh],
                 [chmod +x test/faithfulness-ftb-3.1-quick.sh])
+AC_CONFIG_FILES([test/conllu-fi-ud-test.sh],
+                [chmod +x test/conllu-fi-ud-test.sh])
+AC_CONFIG_FILES([test/conllu-fi-ftb-ud-test.sh],
+                [chmod +x test/conllu-fi-ftb-ud-test.sh])
 AC_CONFIG_FILES([test/speed-test.sh],
                 [chmod +x test/speed-test.sh])
 AC_CONFIG_FILES([test/coverages-all-quick.sh],
@@ -310,14 +387,20 @@ cat <<EOF
 Configured $PACKAGE_STRING:
 =======
 * Analysers: $with_hfst
-    * OMOR $enable_omor
-    * FTB3.1 $enable_ftb3
-    * apertium $enable_apertium
+    * General options:
+        * dehyphenation: $enable_dehyphenation
+        * early-modern Finnish support: $enable_emf
+        * colloquial Finnish support: $enable_colloq
+    * OMOR: $enable_omor $OMORPROPFLAG $OMORALLOFLAG $OMORPARAFLAG $OMORSEMFLAG $OMORKTNKAVFLAG $OMORSEGMENTSFLAG
+        * guesser: $enable_omor_guesser (needs --enable-omor-ktnkav)
+    * FTB3.1: $enable_ftb3
+    * apertium: $enable_apertium
     * giella: $enable_giella
     * labeled segmenter: $enable_labeled_segments
-* Extras: $with_extras
 * Applications
     * Voikko speller: $enable_voikko
+    * acceptor: $enable_acceptor
+    * tokeniser: $enable_tokeniser
     * segmenter: $enable_segmenter
     * lemmatiser: $enable_lemmatiser
     * hyphenators: $enable_hyphenator
@@ -327,6 +410,4 @@ Configured $PACKAGE_STRING:
 EOF
 AS_IF([test x$TIME = xfalse], [AC_MSG_WARN([GNU time is missing, tests will fail])])
 AS_IF([test x$PYTHON = x:], [AC_MSG_WARN([python3 is required for lexical database use])])
-AS_IF([test x$enable_segmenter != xno -a x$enable_ftb3 = xno], [AC_MSG_WARN([Disabled segmenter since disabled FTB3])])
-AS_IF([test x$enable_lemmatiser != xno -a x$enable_ftb3 = xno], [AC_MSG_WARN([Disabled lemmatiser since disabled FTB3])])
 $THEREARENOEASTEREGGS say make, make check and make install to proceed

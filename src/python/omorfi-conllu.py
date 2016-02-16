@@ -13,7 +13,7 @@ import re
 
 def get_lemmas(anal):
     re_lemma = re.compile("\[WORD_ID=([^]]*)\]")
-    lemmas = re_lemma.finditer(anal.output)
+    lemmas = re_lemma.finditer(anal[0])
     rv = []
     for lemma in lemmas:
         rv += [lemma.group(1)]
@@ -21,7 +21,7 @@ def get_lemmas(anal):
 
 def get_last_feat(feat, anal):
     re_feat = re.compile("\[" + feat + "=([^]]*)\]")
-    feats = re_feat.finditer(anal.output)
+    feats = re_feat.finditer(anal[0])
     rv = ""
     for feat in feats:
         rv = feat.group(1)
@@ -30,7 +30,7 @@ def get_last_feat(feat, anal):
 def get_last_feats(anal):
     re_feats = re.compile("\[[^]]*\]")
     rvs = list()
-    feats = re_feats.finditer(anal.output)
+    feats = re_feats.finditer(anal[0])
     for feat in feats:
         if 'BOUNDARY=' in feat.group(0) or 'WORD_ID=' in feat.group(0):
             rvs = list()
@@ -65,6 +65,10 @@ def format_feats_ud(anal):
             rvs['VerbForm'] = 'Fin'
             if value == 'INDV':
                 rvs['Mood'] = 'Ind'
+            elif value == 'COND':
+                rvs['Mood'] = 'Cnd'
+            elif value == 'IMPV':
+                rvs['Mood'] = 'Imp'
             else:
                 rvs['Mood'] = value[0] + value[1:].lower()
         elif key == 'VOICE':
@@ -97,8 +101,11 @@ def format_feats_ud(anal):
         elif key == 'NEG':
             if value == 'CON':
                 rvs['Connegative'] = 'Yes'
+                # XXX
+                rvs.pop('Voice')
             elif value == 'NEG':
-                rvs['Negative'] = 'Yes'
+                rvs['Negative'] = 'Neg'
+                rvs['VerbForm'] = 'Fin'
         elif key == 'PCP':
             rvs['VerbForm'] = 'Part'
             if value == 'VA':
@@ -115,8 +122,12 @@ def format_feats_ud(anal):
                 rvs['InfForm'] = '1'
             elif value == 'E':
                 rvs['InfForm'] = '2'
+                # XXX
+                rvs['Number'] = 'Sing'
             elif value == 'MA':
                 rvs['InfForm'] = '3'
+                # XXX
+                rvs['Number'] = 'Sing'
             elif value == 'MINEN':
                 rvs['InfForm'] = '4'
             elif value == 'MAISILLA':
@@ -130,28 +141,33 @@ def format_feats_ud(anal):
                 rvs['Degree'] = 'Pos'
         elif key == 'SUBCAT':
             if value == 'NEG':
-                rvs['Negative'] = 'Yes'
+                rvs['Negative'] = 'Neg'
+                rvs['VerbForm'] = 'Fin'
             elif value == 'QUANTIFIER':
                 rvs['PronType'] = 'Ind'
+            elif value == 'REFLEXIVE':
+                rvs['Reflexive'] = 'Yes'
             elif value in ['COMMA', 'DASH', 'QUOTATION', 'BRACKET']:
                 # not annotated in UD feats: 
                 # * punctuation classes
                 continue
-            elif value in ['REFLEXIVE', 'DECIMAL', 'ROMAN']:
+            elif value in ['DECIMAL', 'ROMAN']:
                 # not annotated in UD feats:
-                # * reflexive PronType
                 # * decimal, roman NumType
                 continue
             else:
                 print("Unhandled subcat: ", value)
-                print("in", anal[0].output)
+                print("in", anal[0][0])
                 exit(1)
         elif key == 'ABBR':
-            rvs['Abbr'] = value[0] + value[1:].lower()
+            # XXX?
+            rvs['Abbr'] = 'Yes'
         elif key == 'NUMTYPE':
             rvs['NumType'] = value[0] + value[1:].lower()
         elif key == 'PRONTYPE':
             rvs['PronType'] = value[0] + value[1:].lower()
+        elif key == 'ADPTYPE':
+            rvs['AdpType'] = value[0] + value[1:].lower()
         elif key == 'CLIT':
             rvs['Clitic'] = value[0] + value[1:].lower()
         elif key == 'FOREIGN':
@@ -169,19 +185,23 @@ def format_feats_ud(anal):
                 continue
             else:
                 print("Unknown style", value)
-                print("in", anal.output)
+                print("in", anal[0])
                 exit(1)
         elif key in ['DRV', 'LEX']:
-            if value in ['MINEN', 'STI']:
+            if value in ['INEN', 'JA', 'LAINEN', 'LLINEN', 'MINEN', 'STI',
+                    'TAR', 'TON', 'TTAA', 'TTAIN', 'U', 'VS']:
+                # values found in UD finnish Derivs
                 rvs['Derivation'] = value[0] + value[1:].lower()
-            elif value in ['TTAIN', 'S', 'MAISILLA']:
+            elif value in ['S', 'MAISILLA', 'VA', 'MATON', 'UUS', 
+                    'ADE', 'INE', 'ELA', 'ILL']:
+                # valuse not found in UD finnish Derivs
                 continue
             else:
                 print("Unknown non-inflectional affix", key, '=', value)
-                print("in", anal.output)
+                print("in", anal[0])
                 exit(1)
         elif key in ['UPOS', 'ALLO', 'WEIGHT', 'CASECHANGE',
-                'GUESS', 'PROPER', 'POSITION']:
+                'GUESS', 'PROPER', 'POSITION', 'SEM', 'CONJ']:
             # Not feats in UD:
             # * UPOS is another field
             # * Allomorphy is ignored
@@ -191,10 +211,12 @@ def format_feats_ud(anal):
             # * Guessering not a feat
             # * Proper noun classification not a feat
             # * punct sidedness is not a feat
+            # * XXX: sem has not been used as a feat?
+            # * special CONJ comparative is not used in UD
             continue
         else:
             print("Unhandled", key, '=', value)
-            print("in", anal.output)
+            print("in", anal[0])
             exit(1)
     rv = ''
     for k,v in sorted(rvs.items()):
@@ -253,6 +275,11 @@ def try_analyses_conllu(original, wordn, surf, anals, outfile):
             return print_analyses_conllu(wordn, surf, anal, outfile)
     return print_analyses_conllu(wordn, surf, anals[0], outfile)
 
+def debug_analyses_conllu(original, wordn, surf, anals, outfile):
+    print(original, file=outfile)
+    for anal in anals:
+        print_analyses_conllu(wordn, surf, anal, outfile)
+
 def print_analyses_conllu(wordn, surf, anal, outfile):
     upos = get_last_feat("UPOS", anal)
     if not upos or upos == "":
@@ -278,6 +305,8 @@ def main():
             help="print statistics to STATFILE", type=FileType('w'))
     a.add_argument('-O', '--oracle', action='store_true',
             help="match to values in input when parsing if possible")
+    a.add_argument('--debug', action='store_true',
+            help="print lots of debug info while processing")
     options = a.parse_args()
     omorfi = Omorfi(options.verbose)
     if options.fsa:
@@ -321,14 +350,16 @@ def main():
             surf = fields[1]
             anals = omorfi.analyse(surf)
             if anals and len(anals) > 0:
-                if options.oracle:
+                if options.debug:
+                    debug_analyses_conllu(fields, index, surf, anals, options.outfile)
+                elif options.oracle:
                     try_analyses_conllu(fields, index, surf, anals, 
                             options.outfile)
                 else:
                     print_analyses_conllu(index, surf, anals[0], 
                             options.outfile)
             if not anals or len(anals) == 0 or (len(anals) == 1 and 
-                    'UNKNOWN' in anals[0].output):
+                    'UNKNOWN' in anals[0][0]):
                 unknowns += 1
         elif line.startswith('# doc-name:') or line.startswith('# sentence-text:'):
             # these comments I know need to be retained as-is

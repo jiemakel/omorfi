@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Compare two conllu files for matches on each field.
@@ -23,6 +23,8 @@ def main():
             help="Allow fuzzy matches if tokenisation differs")
     a.add_argument('-v', '--verbose', action="store_true", default=False,
             help="Print verbosely while processing")
+    a.add_argument('-t', '--thresholds', metavar='THOLDS', default=99, type=int,
+            help="require THOLD % for lemma, UPOS and UFEAT or exit 1 (for testing)")
     options = a.parse_args()
     #
     lines = 0
@@ -90,18 +92,22 @@ def main():
             missed_lemmas += 1
             print("LEMMA", infields[2], reffields[2], file=options.logfile)
             print("SURFS", infields[1], reffields[1], file=options.logfile)
+            print("LEMMA|SURF", infields[1], reffields[1], infields[2], reffields[2], file=options.logfile)
         if infields[3] != reffields[3]:
             missed_uposes += 1
             print("UPOS", infields[3], reffields[3], file=options.logfile)
             print("SURFS", infields[1], reffields[1], file=options.logfile)
+            print("UPOS|SURF", infields[1], reffields[1], infields[3], reffields[3], file=options.logfile)
         if infields[4] != reffields[4]:
             missed_tdtposes += 1
             print("TDTPOS", infields[4], reffields[4], file=options.logfile)
             print("SURFS", infields[1], reffields[1], file=options.logfile)
+            print("TDTPOS|SURF", infields[1], reffields[1], infields[4], reffields[4], file=options.logfile)
         if infields[5] != reffields[5]:
             missed_feats += 1
             print("UFEAT", infields[5], reffields[5], file=options.logfile)
             print("SURFS", infields[1], reffields[1], file=options.logfile)
+            print("UFEAT|SURF", infields[1], reffields[1], infields[5], reffields[5], file=options.logfile)
         if infields[6] != reffields[6]:
             missed_uds += 1
             print("UD", infields[6], reffields[6], file=options.logfile)
@@ -129,17 +135,26 @@ def main():
             deplines-missed_misc,
             sep="\t")
     print(deplines / deplines * 100, 
-            (deplines-missed_lemmas) / deplines * 100,
-            (deplines-missed_uposes) / deplines * 100,
-            (deplines-missed_feats) / deplines * 100,
-            (deplines-missed_tdtposes) / deplines * 100,
-            (deplines-missed_uds) / deplines * 100,
-            (deplines-missed_udlabs) / deplines * 100,
-            (deplines-missed_deps2) / deplines * 100,
-            (deplines-missed_misc) / deplines * 100,
+            (deplines-missed_lemmas) / deplines * 100 if deplines != 0 else 0,
+            (deplines-missed_uposes) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_feats) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_tdtposes) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_uds) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_udlabs) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_deps2) / deplines * 100if deplines != 0 else 0,
+            (deplines-missed_misc) / deplines * 100if deplines != 0 else 0,
             sep="\t")
     print("Skipped due to tokenisation etc. (no fuzz):", skiplines)
-    exit(0)
+    if deplines == 0 or \
+            ((deplines-missed_lemmas) / deplines * 100 < options.thresholds) or\
+            ((deplines-missed_uposes) / deplines * 100 < options.thresholds) or\
+            ((deplines-missed_feats) / deplines * 100 < options.thresholds):
+        print("needs to have", options.thresholds,
+                "% matches to pass regress test\n",
+                file=stderr)
+        exit(1)
+    else:
+        exit(0)
 
 if __name__ == "__main__":
     main()

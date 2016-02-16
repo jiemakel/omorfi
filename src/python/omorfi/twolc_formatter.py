@@ -72,7 +72,7 @@ def format_alphabet_twolc(format, ruleset):
     elif ruleset == 'apertium':
         for mcs in common_multichars:
             twolcstring += twolc_escape(mcs) + ':0 ! deleting all specials\n'
-    elif ruleset == 'orthographic':
+    elif ruleset == 'dehyphenate':
         twolcstring += ' '.join(fin_lowercase) + '! lower\n'
         twolcstring += ' '.join(fin_uppercase) + '! upper\n'
         for mcs in common_multichars:
@@ -97,7 +97,7 @@ def format_sets_twolc(format, ruleset):
         twolcstring += 'UpperOrSyms = ' + ' '.join(fin_uppercase) + \
                 ' ' + ' '.join([twolc_escape(s) for s in fin_symbols]) +\
                 '; ' + '! Symbols for likely hyphenated words\n'
-    elif ruleset == 'hyphenate' or ruleset == 'orthographic':
+    elif ruleset == 'hyphenate' or ruleset == 'dehyphenate':
         twolcstring += 'Vowels = ' + ' '.join(fin_vowels) + ' ;' + \
                 '! Vowels\n'
         twolcstring += 'Consonants = ' + ' '.join(fin_consonants) + ' ;' + \
@@ -150,25 +150,17 @@ def format_rules_twolc(format, ruleset):
     elif ruleset == 'apertium':
         twolcstring += '"Remove stuffs"\n'
         twolcstring += "a <= _ ; ! remove everywhere\n"
-    elif ruleset == 'orthographic':
-        if '+dehyphenate' in format:
-            twolcstring += '"Dehyphenate before consonant clusters"\n'
-            twolcstring += "0:%- <=> Vowels (Consonants) (Consonants) _ Consonants Vowels ;\n"
-            twolcstring += '"Dehyphenate between non-diphtongs"\n'
-            twolcstring += "0:%- <=> Vx _ Vy ;\n"
-            twolcstring += "\twhere Vx in (a a a a a e e e e i i i i o o o o o u u u u u y y y y y ä ä ä ä ä ö ö ö ö)\n"
-            twolcstring += "\t\tVy in (e o y ä ö a o ä ö a o ä ö a e y ä ö a e y ä ö e ä a o u e ö a o u ä a o u) matched ;\n"
-            twolcstring += '"Dehyphenate diphtongs in latter syllables"\n'
-            twolcstring += "0:%- <=> WordBoundary (Consonants) (Consonants) [Vowels (Vowels) Consonants (Consonants)]+ Vx _ Vy ;\n"
-            twolcstring += "\twhere Vx in (a e o u y ä ö a e i o ä ö u y i e i)\n"
-            twolcstring += "\t\tVy in (i i i i i i i u u u u y y o ö y y e) matched ;\n"
-        else:
-            twolcstring += '"Dummy rule 2"\n'
-            twolcstring += "a <= _ ; ! Dummy rule\n"
-            twolcstring += '"Dummy rule 3"\n'
-            twolcstring += "a <= _ ; ! Dummy rule\n"
-            twolcstring += '"Dummy rule 4"\n'
-            twolcstring += "a <= _ ; ! Dummy rule\n"
+    elif ruleset == 'dehyphenate':
+        twolcstring += '"Dehyphenate before consonant clusters"\n'
+        twolcstring += "0:%- <=> Vowels (Consonants) (Consonants) _ Consonants Vowels ;\n"
+        twolcstring += '"Dehyphenate between non-diphtongs"\n'
+        twolcstring += "0:%- <=> Vx _ Vy ;\n"
+        twolcstring += "\twhere Vx in (a a a a a e e e e i i i i o o o o o u u u u u y y y y y ä ä ä ä ä ö ö ö ö)\n"
+        twolcstring += "\t\tVy in (e o y ä ö a o ä ö a o ä ö a e y ä ö a e y ä ö e ä a o u e ö a o u ä a o u) matched ;\n"
+        twolcstring += '"Dehyphenate diphtongs in latter syllables"\n'
+        twolcstring += "0:%- <=> WordBoundary (Consonants) (Consonants) [Vowels (Vowels) Consonants (Consonants)]+ Vx _ Vy ;\n"
+        twolcstring += "\twhere Vx in (a e o u y ä ö a e i o ä ö u y i e i)\n"
+        twolcstring += "\t\tVy in (i i i i i i i u u u u y y o ö y y e) matched ;\n"
     else:
         print("Unknown ruleset", ruleset, file=stderr)
         exit(1)
