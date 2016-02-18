@@ -93,3 +93,4 @@ test/html-entity-names.sed
 test/xml-entity-codes.sed
 src/generated
 src/voikko/index.xml
+src/voikko/speller-omorfi.zhfst
