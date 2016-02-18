@@ -19,7 +19,7 @@
 #
 # utils to format xerox regexes from omor's lexical data sources.
 
-from .settings import fin_vowels, fin_orth_pairs, fin_lowercase, fin_uppercase, \
+from .settings import fin_orth_pairs, fin_lowercase, fin_uppercase, \
         word_boundary, deriv_boundary, morph_boundary, newword_boundary, \
         deriv_boundary, stub_boundary, weak_boundary, optional_hyphen
 from .twolc_formatter import twolc_escape
@@ -33,14 +33,7 @@ def format_rules_regex(formatter, ruleset):
                     ' | ' + twolc_escape(p[0]) + ' | '
         if ruleset == 'orthographic-variations-emf':
             regexstring += 'v:w::1 | {ks}:x::1 | {ts}:z::1 | {mp}:{mb}::1 | {nt}:{nd}::1 | {lt}:{ld}::1 | '
-        regexstring += '? ]* '
-        if ruleset == 'orthographic-variations-emf':
-            regexstring += '(0:i::1) (['
-            for v in fin_vowels:
-                regexstring += v + ' | '
-            regexstring = regexstring[:-3] + ' ] 0:\'::1) ;'
-        else:
-            regexstring += ';'
+        regexstring += '? ]* ;'
     elif ruleset == 'zh':
         regexstring += '[ ž | ž:z 0:h | ž:z::1 ] ;'
     elif ruleset == 'sh':
@@ -84,7 +77,7 @@ def format_rules_regex(formatter, ruleset):
                     ' (->) ' + formatter.stuff2lexc('ABBREVIATION') +\
                     ' || _ '
             regexstring += '.o.\n'
-            regexstring += '# abbrs are nom sg’s too\n' 
+            regexstring += '# abbrs are nom sg’s too\n'
             regexstring += formatter.stuff2lexc('ABBREVIATION') +\
                     ' (->) ' + formatter.stuff2lexc('ABBREVIATION') +\
                     ' ' + formatter.stuff2lexc('Xnom') +\
@@ -134,4 +127,3 @@ def format_rules_regex(formatter, ruleset):
         print("Unknown ruleset", ruleset)
         return None
     return regexstring
-
