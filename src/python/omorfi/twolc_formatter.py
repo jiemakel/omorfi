@@ -3,7 +3,8 @@
 from sys import stderr, exit
 from .settings import common_multichars, \
         fin_lowercase, fin_uppercase, fin_vowels, fin_consonants, \
-        fin_symbols, optional_hyphen, word_boundary, newword_boundary
+        fin_symbols, optional_hyphen, word_boundary, newword_boundary, \
+        weak_boundary, deriv_boundary, morph_boundary, stub_boundary
 
 def format_copyright_twolc():
     return """
@@ -115,9 +116,15 @@ def format_definitions_twolc(format, ruleset):
     if ruleset == 'hyphenate':
         twolcstring += 'WordBoundary = [ %- | :%- | ' \
                 + twolc_escape(word_boundary) + ':0 | #: | .#. ] ;\n'
-    elif ruleset == 'orthographic':
+    elif ruleset == 'dehyphenate':
         twolcstring += 'WordBoundary = [ %- | :%- | ' \
-                + twolc_escape(word_boundary) + ' | #: | .#. ] ;\n'
+                + twolc_escape(word_boundary) + ' | # | .#. ] ;\n'
+        twolcstring += 'WeakBoundary = [ ' \
+                + twolc_escape(weak_boundary) + ' | ' \
+                + twolc_escape(deriv_boundary) + ' | '  \
+                + twolc_escape(morph_boundary) + ' | ' \
+                + twolc_escape(stub_boundary)  + ' | ' \
+                + twolc_escape(morph_boundary) + ' ] ;\n'
     twolcstring += 'DUMMYDEFINITIONCANBEUSEDTOTESTBUGS = a | b | c ;\n'
     return twolcstring
 
@@ -152,13 +159,13 @@ def format_rules_twolc(format, ruleset):
         twolcstring += "a <= _ ; ! remove everywhere\n"
     elif ruleset == 'dehyphenate':
         twolcstring += '"Dehyphenate before consonant clusters"\n'
-        twolcstring += "0:%- <=> Vowels (Consonants) (Consonants) _ Consonants Vowels ;\n"
+        twolcstring += "0:%- <=> Vowels (WeakBoundary) (Consonants) (WeakBoundary) (Consonants) (WeakBoundary) _ (WeakBoundary) Consonants (WeakBoundary) Vowels ;\n"
         twolcstring += '"Dehyphenate between non-diphtongs"\n'
-        twolcstring += "0:%- <=> Vx _ Vy ;\n"
+        twolcstring += "0:%- <=> Vx (WeakBoundary) _ Vy ;\n"
         twolcstring += "\twhere Vx in (a a a a a e e e e i i i i o o o o o u u u u u y y y y y ä ä ä ä ä ö ö ö ö)\n"
         twolcstring += "\t\tVy in (e o y ä ö a o ä ö a o ä ö a e y ä ö a e y ä ö e ä a o u e ö a o u ä a o u) matched ;\n"
         twolcstring += '"Dehyphenate diphtongs in latter syllables"\n'
-        twolcstring += "0:%- <=> WordBoundary (Consonants) (Consonants) [Vowels (Vowels) Consonants (Consonants)]+ Vx _ Vy ;\n"
+        twolcstring += "0:%- <=> WordBoundary (Consonants) (Consonants) [(WeakBoundary) Vowels (WeakBoundary) (Vowels) (WeakBoundary) Consonants (WeakBoundary) (Consonants) (WeakBoundary)]+ (WeakBoundary) Vx (WeakBoundary) _ Vy ;\n"
         twolcstring += "\twhere Vx in (a e o u y ä ö a e i o ä ö u y i e i)\n"
         twolcstring += "\t\tVy in (i i i i i i i u u u u y y o ö y y e) matched ;\n"
     else:
