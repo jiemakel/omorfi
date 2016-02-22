@@ -113,7 +113,7 @@ def main():
         formatter = OmorFormatter(args.verbose, new_para=args.omor_new_para,
                                   allo=args.omor_allo, props=args.omor_props,
                                   sem=args.omor_sem, segments=args.omor_segments,
-                                  ktnkav=args.ktnkav)
+                                  ktnkav=args.omor_ktnkav)
     elif args.format == 'ftb3':
         formatter = Ftb3Formatter(args.verbose)
     elif args.format == 'apertium':
