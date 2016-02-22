@@ -111,7 +111,9 @@ def main():
     formatter = None
     if args.format == 'omor':
         formatter = OmorFormatter(args.verbose, new_para=args.omor_new_para,
-                                  allo=args.omor_allo, props=args.omor_props, sem=args.omor_sem)
+                                  allo=args.omor_allo, props=args.omor_props,
+                                  sem=args.omor_sem, segments=args.segments,
+                                  ktnkav=args.ktnkav)
     elif args.format == 'ftb3':
         formatter = Ftb3Formatter(args.verbose)
     elif args.format == 'apertium':
