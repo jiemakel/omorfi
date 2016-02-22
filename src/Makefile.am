@@ -264,6 +264,10 @@ if WANT_EMF
 LEXEMES_TO_JOIN+=-i lexemes-emf.tsv
 endif
 
+if WANT_COLLOQ
+LEXEMES_TO_JOIN+=-i lexemes-col.tsv
+endif
+
 generated/joint.tsv: $(LEXEMES) $(LEMMA_JOINS) generated/timestamp
 	$(PYTHON) $(srcdir)/python/tsvjoin.py -v $(LEXEMES_TO_JOIN) \
 		-j $(srcdir)/attributes/abbr.tsv \
