@@ -106,6 +106,8 @@ def main():
                     help="include segments in raw analyses")
     ap.add_argument("--omor-ktnkav", action="store_true", default=False,
                     help="include kotus inflection/gradation in raw analyses")
+    ap.add_argument("--omor-dialects", action="store_true", default=False,
+                    help="include dialects in raw analyses")
     args = ap.parse_args()
 
     formatter = None
@@ -113,7 +115,7 @@ def main():
         formatter = OmorFormatter(args.verbose, new_para=args.omor_new_para,
                                   allo=args.omor_allo, props=args.omor_props,
                                   sem=args.omor_sem, segments=args.omor_segments,
-                                  ktnkav=args.omor_ktnkav)
+                                  ktnkav=args.omor_ktnkav, dialects=args.omor_dialects)
     elif args.format == 'ftb3':
         formatter = Ftb3Formatter(args.verbose)
     elif args.format == 'apertium':

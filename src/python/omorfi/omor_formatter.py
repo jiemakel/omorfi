@@ -321,6 +321,14 @@ class OmorFormatter(Formatter):
         '[KAV=K]', '[KAV=L]', '[KAV=M]',
         '[KAV=N]', '[KAV=O]', '[KAV=P]', '[KAV=T]'}
 
+    subkeys2omor = {
+        "Z": "[DIALECT="
+    }
+
+    subkeys_multichars = {
+        "Z": ["420", "615"]
+    }
+
     stuff2omor = {
         ".sent": "[BOUNDARY=SENTENCE]",
         "Aa": "[ALLO=A]",
@@ -621,13 +629,22 @@ class OmorFormatter(Formatter):
         this.segments = True
         if not 'segments' in kwargs or not kwargs['segments']:
             this.segments = False
-
+        this.dialects = True
+        if not 'dialects' in kwargs or not kwargs['dialects']:
+            for k, v in this.subkeys2omor.items():
+                if v == "[DIALECT=":
+                    this.subkeys2omor[k] = ""
+            this.dialects = False
 
     def stuff2lexc(this, stuff):
         if stuff == '0':
             return "0"
         if stuff in this.stuff2omor:
             return this.stuff2omor[stuff]
+        if stuff[0] in this.subkeys2omor:
+            if this.subkeys2omor[stuff[0]] == '':
+                return ""
+            return this.subkeys2omor[stuff[0]] + lexc_escape(stuff[1:]) + ']'
         else:
             if this.verbose:
                 fail_formatting_missing_for(stuff, "omor")
@@ -764,6 +781,14 @@ class OmorFormatter(Formatter):
         multichars += "!! OMOR multichars:\n"
         for mcs in this.common_multichars:
             multichars += mcs + "\n"
+        if this.ktnkav:
+            for mcs in this.ktnkav_multichars:
+                multichars += mcs + "\n"
+        if this.dialects:
+            for subkey, subvalues in this.subkeys_multichars.items():
+                for subvalue in subvalues:
+                    multichars += this.subkeys2omor[subkey] +\
+                        lexc_escape(subvalue + ':') + "\n"
         multichars += Formatter.multichars_lexc(this)
         return multichars
 

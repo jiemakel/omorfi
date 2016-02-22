@@ -394,7 +394,7 @@ generated/omorfi-omor.lexc: generated/master.tsv generated/stemparts.tsv \
 	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		-i generated/inflections.tsv -o $@ -f=omor \
-		$(OMORALLOFLAG) $(OMORPARAFLAG) $(OMORSEMFLAG) $(OMORPROPFLAG) $(OMORKTNKAVFLAG) $(OMORSEGMENTSFLAG) $(OMOREMFFLAG) $(OMORCOLLOQFLAG)
+		$(OMORALLOFLAG) $(OMORPARAFLAG) $(OMORSEMFLAG) $(OMORPROPFLAG) $(OMORKTNKAVFLAG) $(OMORDIALECTSFLAG) $(OMORSEGMENTSFLAG)
 
 generated/omorfi-omor-rewrite-tags.regex:
 	$(PYTHON) $(srcdir)/python/generate-regexes.py -f=omor \

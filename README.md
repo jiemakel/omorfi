@@ -5,12 +5,13 @@ Adds support for:
  * including segment information in OMOR analysis
  * [early modern Finnish](README-EMF.md) (orthographical variation, inflection and lexicon)
  * colloquial Finnish (inflection and lexicon)
+ * including dialectical information in OMOR analysis
  * generating an OMOR lemma guesser
 
 To get all the treats, use the following flags in your configure -script:
 
 ```
-./configure --enable-dehyphenation --enable-emf --enable-colloq --enable-omor --enable-omor-ktnkav --enable-omor-segments --enable-omor-guesser
+./configure --enable-dehyphenation --enable-emf --enable-colloq --enable-omor --enable-omor-ktnkav --enable-omor-dialects --enable-omor-segments --enable-omor-guesser
 ```
 
 Original README follows:
@@ -114,7 +115,7 @@ for autotools systems.
 
 ## Usage
 
-Omorfi comes with several simple scripts for basic functionalities. These 
+Omorfi comes with several simple scripts for basic functionalities. These
 scripts cover the most basic usage with minimal amount of required extra
 tools, however, for advanced usage you may want to check the APIs or bindings
 for python and Java.
@@ -127,7 +128,7 @@ Following are basic shell scripts that only use *HFST* tools and GNU
 - `omorfi-generate.sh`: generate word-forms from omor descriptions
 - `omorfi-segment.sh`: morphologically segment word-forms one per line
 
-The following requires *python* and *VISL CG 3* 
+The following requires *python* and *VISL CG 3*
 
 - `omorfi-disambiguate-text.sh`: analyse text and disambiguate using VISL CG-3
 
@@ -156,14 +157,14 @@ ASCII characters which are also available as single-character symbols. The
 input stream will always be tokenised using the longest symbols available.
 Use the -t option to view the tokenisation. The problematic symbol(s):
 SS
-Ensimmäinen	
+Ensimmäinen
 Ensimmäinen	Ensimmäinen N Nom Sg
 Ensimmäinen	Ensimmäinen Num Ord Nom Sg
 
-runo	
+runo
 runo	runo N Nom Sg
 
-Mieleni	
+Mieleni
 Mieleni	Miele N Prop Gen Sg PxSg1
 Mieleni	Miele N Prop Nom Pl PxSg1
 Mieleni	Miele N Prop Nom Sg PxSg1
@@ -171,10 +172,10 @@ Mieleni	Mieli N Gen Sg PxSg1
 Mieleni	Mieli N Nom Pl PxSg1
 Mieleni	Mieli N Nom Sg PxSg1
 
-minun	
+minun
 minun	minä Pron Pers Gen Sg
 
-tekevi	
+tekevi
 tekevi	tehdä V Prs Act Sg3
 
 ...
@@ -184,7 +185,7 @@ If your text is already split into word-forms (one word-form per line), it can
 be analysed like this:
 
 ```
-$ omorfi-analyse-tokenised.sh test/wordforms.list 
+$ omorfi-analyse-tokenised.sh test/wordforms.list
 > 1	1 Num Digit Nom Sg	0,000000
 
 > 10	10 Num Digit Nom Sg	0,000000
@@ -212,7 +213,7 @@ $ omorfi-analyse-tokenised.sh test/wordforms.list
 
 #### VISL CG 3 format
 
-CG style format can be generated using python based analyser script 
+CG style format can be generated using python based analyser script
 `omorfi-analyse.py`:
 
 ```
@@ -323,7 +324,7 @@ Moses factored analysis format can be generated using python script:
 omorfi-factorise.py
 tämä kyllä toimii oikein.
 tämä|tämä|PRONOUN|PRONOUN.DEMONSTRATIVE.SG.NOM|0 kyllä|kyllä|ADVERB|ADVERB|0 \
-toimii|toimia|VERB|VERB.ACT.INDV.PRESENT.SG3|.i oikein.|oikein.|UNK|UNKNOWN|0 
+toimii|toimia|VERB|VERB.ACT.INDV.PRESENT.SG3|.i oikein.|oikein.|UNK|UNKNOWN|0
 ```
 
 The input should be in format produced by moses's `tokenizer.perl` (truecase or
@@ -371,7 +372,7 @@ Generating word-forms can be done using:
 
 ```
 omorfi-generate.sh
-$ omorfi-generate.sh 
+$ omorfi-generate.sh
 > [WORD_ID=talo][POS=NOUN][NUM=SG][CASE=INE]
 [WORD_ID=talo][POS=NOUN][NUM=SG][CASE=INE]	talossa	0,000000
 ```
@@ -390,7 +391,7 @@ Python interface (check wiki page Python API for details):
 
 ```
 $ python
-Python 3.4.1 (default, Oct 16 2014, 03:32:31) 
+Python 3.4.1 (default, Oct 16 2014, 03:32:31)
 [GCC 4.7.3] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from omorfi.omorfi import Omorfi
@@ -432,7 +433,7 @@ omorfi.hyphenate.hfst    omorfi.lemmatise.hfst      omorfi-omor.analyse.hfst
 
 The naming *has changed* in 2014–2015 cycle! This was made because people seem
 to distribute automata over the net without attributions, at least the default
-filenames for most automata are now `omorfi*.hfst`. The system is: 
+filenames for most automata are now `omorfi*.hfst`. The system is:
 omorfi.`function`.hfst, or omorfi-`variant`.`function`.hfst. The variants
 other than `omor` are for convenience and interoperability, and have recasing
 built in, but since they encode existing standards, will also be more
@@ -444,7 +445,7 @@ You can directly access specific automata with HFST tools (detailed in their
 man pages and [HFST wiki](https://kitwiki.csc.fi/):
 
 ```
-$ hfst-lookup /usr/local/share/omorfi/omorfi.segment.hfst 
+$ hfst-lookup /usr/local/share/omorfi/omorfi.segment.hfst
 > talossani
 talossani	talo{STUB}{MB}ssa{MB}ni	0,000000
 
@@ -458,7 +459,7 @@ hirveä	hirv{STUB}e{MB}ä	0,000000
 > kissakoira-apina
 kissakoira-apina	kiss{STUB}a{wB}koir{STUB}a{wB}apin{STUB}a	0,000000
 
-> 
+>
 ```
 
 ## Troubleshooting

@@ -92,6 +92,13 @@ AC_ARG_ENABLE([omor_ktnkav],
                               [enable_omor_ktnkav=no])
 AS_IF([test x$enable_omor_ktnkav != xno],
       [AC_SUBST([OMORKTNKAVFLAG], ["--omor-ktnkav"])])
+AC_ARG_ENABLE([omor_dialects],
+              [AS_HELP_STRING([--enable-omor-dialects],
+                              [include dialect information feature in omors @<:@default=disable@:>@])],
+                              [enable_omor_dialects=$enableval],
+                              [enable_omor_dialects=no])
+AS_IF([test x$enable_omor_dialects != xno],
+      [AC_SUBST([OMORDIALECTSFLAG], ["--omor-dialects"])])
 AC_ARG_ENABLE([omor_guesser],
               [AS_HELP_STRING([--enable-omor-guesser],
                               [generate omor guesser @<:@default=disable@:>@])],
@@ -391,7 +398,7 @@ Configured $PACKAGE_STRING:
         * dehyphenation: $enable_dehyphenation
         * early-modern Finnish support: $enable_emf
         * colloquial Finnish support: $enable_colloq
-    * OMOR: $enable_omor $OMORPROPFLAG $OMORALLOFLAG $OMORPARAFLAG $OMORSEMFLAG $OMORKTNKAVFLAG $OMORSEGMENTSFLAG
+    * OMOR: $enable_omor $OMORPROPFLAG $OMORALLOFLAG $OMORPARAFLAG $OMORSEMFLAG $OMORKTNKAVFLAG $OMORDIALECTSFLAG $OMORSEGMENTSFLAG
         * guesser: $enable_omor_guesser (needs --enable-omor-ktnkav)
     * FTB3.1: $enable_ftb3
     * apertium: $enable_apertium
