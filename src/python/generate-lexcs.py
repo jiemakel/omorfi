@@ -44,6 +44,7 @@ from omorfi.parse_csv_data import parse_defaults_from_tsv
 
 # standard UI stuff
 
+
 def main():
     # defaults
     stubfiles = dict()
@@ -51,65 +52,66 @@ def main():
     inflectfiles = dict()
     curr_lexicon = dict()
     # initialise argument parser
-    ap = argparse.ArgumentParser(description="Convert Finnish dictionary TSV data into xerox/HFST lexc format")
+    ap = argparse.ArgumentParser(
+        description="Convert Finnish dictionary TSV data into xerox/HFST lexc format")
     ap.add_argument("--quiet", "-q", action="store_false", dest="verbose",
-            default=False,
-            help="do not print output to stdout while processing")
+                    default=False,
+                    help="do not print output to stdout while processing")
     ap.add_argument("--verbose", "-v", action="store_true", default=False,
-            help="print each step to stdout while processing")
+                    help="print each step to stdout while processing")
     ap.add_argument("--master", "-m", action="append", required=True,
-            dest="masterfilenames",
-            metavar="MFILE", help="read lexical roots from MFILEs")
+                    dest="masterfilenames",
+                    metavar="MFILE", help="read lexical roots from MFILEs")
     ap.add_argument("--stemparts", "-p", action="append", required=True,
-            dest='spfilenames',
-            metavar="SPFILE", help="read lexical roots from SPFILEs")
+                    dest='spfilenames',
+                    metavar="SPFILE", help="read lexical roots from SPFILEs")
     ap.add_argument("--inflection", "-i", action="append", required=True,
-            dest='inffilenames',
-            metavar="INFFILE", help="read inflection from INFFILEs")
+                    dest='inffilenames',
+                    metavar="INFFILE", help="read inflection from INFFILEs")
     ap.add_argument("--exclude-pos", "-x", action="append",
-            metavar="XPOS",
-            help="exclude all XPOS parts of speech from generation")
+                    metavar="XPOS",
+                    help="exclude all XPOS parts of speech from generation")
     ap.add_argument("--include-lemmas", "-I", action="append", type=open,
-            metavar="ILFILE", help="read lemmas to include from ILFILE")
+                    metavar="ILFILE", help="read lemmas to include from ILFILE")
     ap.add_argument("--version", "-V", action="version")
     ap.add_argument("--output", "-o", "--one-file", "-1",
-            type=argparse.FileType("w"), required=True,
-            metavar="OFILE", help="write output to OFILE")
+                    type=argparse.FileType("w"), required=True,
+                    metavar="OFILE", help="write output to OFILE")
     ap.add_argument("--fields", "-F", action="store", default=2,
-            metavar="N", help="read N fields from master")
+                    metavar="N", help="read N fields from master")
     ap.add_argument("--separator", action="store", default="\t",
-            metavar="SEP", help="use SEP as separator")
+                    metavar="SEP", help="use SEP as separator")
     ap.add_argument("--comment", "-C", action="append", default=["#"],
-            metavar="COMMENT", help="skip lines starting with COMMENT that"
-                "do not have SEPs")
+                    metavar="COMMENT", help="skip lines starting with COMMENT that"
+                    "do not have SEPs")
     ap.add_argument("--strip", action="store",
-            metavar="STRIP", help="strip STRIP from fields before using")
+                    metavar="STRIP", help="strip STRIP from fields before using")
     ap.add_argument("--format", "-f", action="store", default="omor",
-            help="use specific output format for lexc data",
-            choices=["omor", "giella", "ftb3", "ftb1", "none", "apertium",
-                "labelsegments"])
+                    help="use specific output format for lexc data",
+                    choices=["omor", "giella", "ftb3", "ftb1", "none", "apertium",
+                             "labelsegments"])
     ap.add_argument("--omor-new-para", action="store_true", default=False,
-            help="include NEW_PARA= in raw analyses")
+                    help="include NEW_PARA= in raw analyses")
     ap.add_argument("--omor-allo", action="store_true", default=False,
-            help="include ALLO= in raw analyses")
+                    help="include ALLO= in raw analyses")
     ap.add_argument("--omor-props", action="store_true", default=False,
-            help="include PROPER= in raw analyses")
+                    help="include PROPER= in raw analyses")
     ap.add_argument("--omor-sem", action="store_true", default=False,
-            help="include SEM= in raw analyses")
+                    help="include SEM= in raw analyses")
     ap.add_argument("--none-lemmas", action="store_true", default=False,
-            help="include lemmas in raw analyses")
+                    help="include lemmas in raw analyses")
     ap.add_argument("--none-segments", action="store_true", default=False,
-            help="include segments in raw analyses")
+                    help="include segments in raw analyses")
     ap.add_argument("--omor-segments", action="store_true", default=False,
-            help="include segments in raw analyses")
+                    help="include segments in raw analyses")
     ap.add_argument("--omor-ktnkav", action="store_true", default=False,
-            help="[include kotus inflection/gradation in raw analyses")
+                    help="include kotus inflection/gradation in raw analyses")
     args = ap.parse_args()
 
     formatter = None
     if args.format == 'omor':
         formatter = OmorFormatter(args.verbose, new_para=args.omor_new_para,
-                allo=args.omor_allo, props=args.omor_props, sem=args.omor_sem, segments=args.omor_segments, ktnkav=args.omor_ktnkav)
+                                  allo=args.omor_allo, props=args.omor_props, sem=args.omor_sem)
     elif args.format == 'ftb3':
         formatter = Ftb3Formatter(args.verbose)
     elif args.format == 'apertium':
@@ -118,7 +120,7 @@ def main():
         formatter = GiellaFormatter(args.verbose)
     elif args.format == 'none':
         formatter = NoTagsFormatter(args.verbose,
-                lemmatise=args.none_lemmas, segment=args.none_segments)
+                                    lemmatise=args.none_lemmas, segment=args.none_segments)
     elif args.format == 'labelsegments':
         formatter = LabeledSegmentsFormatter(args.verbose)
     else:
@@ -135,7 +137,7 @@ def main():
     if args.include_lemmas:
         for lemma_file in args.include_lemmas:
             if args.verbose:
-                print("including only lemmas from", lemma_file.name);
+                print("including only lemmas from", lemma_file.name)
             for line in lemma_file:
                 lemmas.append(line.rstrip('\n'))
             lemma_file.close()
@@ -146,7 +148,7 @@ def main():
         print("Writing everything to", args.output.name)
         if args.exclude_pos:
             print("Not writing closed parts-of-speech data in",
-                    ",".join(args.exclude_pos))
+                  ",".join(args.exclude_pos))
     # print definitions to rootfile
     print(formatter.copyright_lexc(), file=args.output)
     if args.verbose:
@@ -168,7 +170,7 @@ def main():
         # for each line
         with open(tsv_filename, "r", newline='') as tsv_file:
             tsv_reader = csv.DictReader(tsv_file, delimiter=args.separator,
-                    quoting=quoting, escapechar='%', quotechar=quotechar, strict=True)
+                                        quoting=quoting, escapechar='%', quotechar=quotechar, strict=True)
             postponed_suffixes = list()
             postponed_abbrs = {'ABBREVIATION': list(), 'ACRONYM': list()}
             for tsv_parts in tsv_reader:
@@ -177,7 +179,7 @@ def main():
                     print(linecount, "...", sep='', end='\r')
                 if len(tsv_parts) < 18:
                     print("Too few tabs on line", linecount,
-                        "skipping following line completely:", file=stderr)
+                          "skipping following line completely:", file=stderr)
                     print(tsv_parts, file=stderr)
                     continue
                 # read data from database
@@ -199,9 +201,10 @@ def main():
                     continue
                 if curr_lexicon != incoming_lexicon:
                     print("\nLEXICON", incoming_lexicon, end="\n\n",
-                            file=args.output)
+                          file=args.output)
                     curr_lexicon = incoming_lexicon
-                # switch back to real POS when possible suffix lexicon has been selected
+                # switch back to real POS when possible suffix lexicon has been
+                # selected
                 if wordmap['real_pos']:
                     wordmap['pos'] = wordmap['real_pos']
                 # format output
@@ -211,12 +214,12 @@ def main():
                 print("\nLEXICON SUFFIX\n\n", file=args.output)
                 for suffix in postponed_suffixes:
                     print(formatter.wordmap2lexc(suffix),
-                            file=args.output)
+                          file=args.output)
             for key, words in postponed_abbrs.items():
                 print("\nLEXICON", key, "\n\n", file=args.output)
                 for word in words:
                     print(formatter.wordmap2lexc(word),
-                            file=args.output)
+                          file=args.output)
         if args.verbose:
             print("\n", linecount, " entries in master db")
     # print stem parts
@@ -225,34 +228,34 @@ def main():
             print("Reading from", tsv_filename)
         linecount = 0
         print("! Omorfi stemparts generated from", tsv_file.name,
-                      "! date:", strftime("%Y-%m-%d %H:%M:%S+%Z"),
-                      "! params: ", ' '.join(argv), file=args.output)
+              "! date:", strftime("%Y-%m-%d %H:%M:%S+%Z"),
+              "! params: ", ' '.join(argv), file=args.output)
         print(formatter.copyright_lexc(), file=args.output)
         curr_lexicon = ""
         with open(tsv_filename, 'r', newline='') as tsv_file:
             tsv_reader = csv.reader(tsv_file, delimiter=args.separator,
-                    strict=True)
+                                    strict=True)
             for tsv_parts in tsv_reader:
                 linecount += 1
                 if len(tsv_parts) < 3:
                     print(tsv_filename, linecount,
-                            "Too few tabs on line",
-                            "skipping following fields:",
-                            tsv_parts, file=stderr)
+                          "Too few tabs on line",
+                          "skipping following fields:",
+                          tsv_parts, file=stderr)
                     continue
                 pos = tsv_parts[0].split("_")[0]
                 if not pos in ["ADJ", "NOUN", "VERB", "PROPN", "NUM",
-                        "PRON", "ADP", "ADV", "SYM", "PUNCT", "INTJ", "X",
-                        "DIGITS", "CONJ", "SCONJ", "AUX", "DET"]:
+                               "PRON", "ADP", "ADV", "SYM", "PUNCT", "INTJ", "X",
+                               "DIGITS", "CONJ", "SCONJ", "AUX", "DET"]:
                     print("Cannot deduce pos from incoming cont:",
-                            tsv_parts[0], "Skipping")
+                          tsv_parts[0], "Skipping")
                     continue
                 if pos in args.exclude_pos:
                     continue
                 # format output
                 if curr_lexicon != tsv_parts[0]:
                     print("\nLEXICON", tsv_parts[0], end="\n\n",
-                            file=args.output)
+                          file=args.output)
                     curr_lexicon = tsv_parts[0]
                 for cont in tsv_parts[3:]:
                     print(formatter.continuation2lexc(
@@ -264,35 +267,35 @@ def main():
             print("Reading from", tsv_filename)
         linecount = 0
         print("! Omorfi inflects generated from", tsv_file.name,
-                      "! date:", strftime("%Y-%m-%d %H:%M:%S+%Z"),
-                      "! params: ", ' '.join(argv), file=args.output)
+              "! date:", strftime("%Y-%m-%d %H:%M:%S+%Z"),
+              "! params: ", ' '.join(argv), file=args.output)
         print(formatter.copyright_lexc(), file=args.output)
         curr_lexicon = ""
         # for each line
         with open(tsv_filename, 'r', newline='') as tsv_file:
             tsv_reader = csv.reader(tsv_file, delimiter=args.separator,
-                    strict=True)
+                                    strict=True)
             for tsv_parts in tsv_reader:
                 linecount += 1
                 if len(tsv_parts) < 3:
                     print(tsv_filename, linecount,
-                            "Too few tabs on line",
-                            "skipping following fields:", tsv_parts,
-                            file=stderr)
+                          "Too few tabs on line",
+                          "skipping following fields:", tsv_parts,
+                          file=stderr)
                     continue
                 pos = tsv_parts[0].split("_")[0]
                 if not pos in ["ADJ", "NOUN", "VERB", "PROPN", "NUM",
-                        "PRON", "ADP", "ADV", "SYM", "PUNCT", "INTJ",
-                        "X", "DIGITS", "CONJ", "SCONJ"]:
+                               "PRON", "ADP", "ADV", "SYM", "PUNCT", "INTJ",
+                               "X", "DIGITS", "CONJ", "SCONJ"]:
                     print("Cannot deduce pos from incoming cont:",
-                            tsv_parts[0], "Skipping")
+                          tsv_parts[0], "Skipping")
                     continue
                 if pos in args.exclude_pos:
                     continue
                 # format output
                 if curr_lexicon != tsv_parts[0]:
                     print("\nLEXICON", tsv_parts[0], end="\n\n",
-                            file=args.output)
+                          file=args.output)
                     curr_lexicon = tsv_parts[0]
                 for cont in tsv_parts[3:]:
                     print(formatter.continuation2lexc(

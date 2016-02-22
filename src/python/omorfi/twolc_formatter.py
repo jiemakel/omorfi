@@ -2,13 +2,13 @@
 
 from sys import stderr, exit
 from .settings import common_multichars, \
-        fin_lowercase, fin_uppercase, fin_vowels, fin_consonants, \
-        fin_symbols, optional_hyphen, word_boundary, newword_boundary, \
-        weak_boundary, deriv_boundary, morph_boundary, stub_boundary
+    fin_lowercase, fin_uppercase, fin_vowels, fin_consonants, \
+    fin_symbols, optional_hyphen, word_boundary, newword_boundary, \
+    weak_boundary, deriv_boundary, morph_boundary, stub_boundary
 
 def format_copyright_twolc():
     return """
-! This automatically generated twolc data is originated from
+! This automatically generated twolc data is originated from 
 ! omorfi database.
 ! Copyright (c) 2014 Omorfi contributors
 
@@ -25,6 +25,7 @@ def format_copyright_twolc():
 ! along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 def twolc_escape(s):
     '''Escape symbols that have special meaning in twolc.'''
     s = s.replace("%", "__PERCENT__")
@@ -33,8 +34,8 @@ def twolc_escape(s):
     s = s.replace("%_%_PERCENT%_%_", "%%")
     return s
 
+
 def format_alphabet_twolc(format, ruleset):
-    print(format)
     twolcstring = 'Alphabet\n'
     if ruleset.startswith('recase'):
         twolcstring += '! Set of Finnish alphabets generated from python:\n'
@@ -61,11 +62,14 @@ def format_alphabet_twolc(format, ruleset):
         for mcs in common_multichars:
             twolcstring += twolc_escape(mcs) + ':0 ! deleting all specials\n'
             if mcs == optional_hyphen or mcs == word_boundary or mcs == newword_boundary:
-                twolcstring += twolc_escape(mcs) + ':%-1 ! always hyphen or nothing\n'
+                twolcstring += twolc_escape(mcs) + \
+                    ':%-1 ! always hyphen or nothing\n'
         twolcstring += '0:%-2 ! weaker hyphens\n'
     elif ruleset == 'hyphens':
-        twolcstring += twolc_escape(optional_hyphen) + ':0  ! boundary can be zero\n'
-        twolcstring += twolc_escape(optional_hyphen) + ':%- ! or (ASCII) hyphen\n'
+        twolcstring += twolc_escape(optional_hyphen) + \
+            ':0  ! boundary can be zero\n'
+        twolcstring += twolc_escape(optional_hyphen) + \
+            ':%- ! or (ASCII) hyphen\n'
         twolcstring += '%-\n'
         for mcs in common_multichars:
             if mcs != optional_hyphen:
@@ -85,24 +89,25 @@ def format_alphabet_twolc(format, ruleset):
     twolcstring += ';\n'
     return twolcstring
 
+
 def format_sets_twolc(format, ruleset):
     twolcstring = 'Sets\n'
     if ruleset.startswith('uppercase') or ruleset.startswith('recase'):
         twolcstring += 'Lower = ' + ' '.join(fin_lowercase) + ' ;' + \
-                '! Lowercase alphabets\n'
+            '! Lowercase alphabets\n'
         twolcstring += 'Upper = ' + ' '.join(fin_uppercase) + ' ;' + \
-                '! Uppercase alphabets\n'
+            '! Uppercase alphabets\n'
     elif ruleset == 'hyphens':
         twolcstring += 'Vowels = ' + ' '.join(fin_vowels) + ' ;' + \
-                '! Vowels\n'
+            '! Vowels\n'
         twolcstring += 'UpperOrSyms = ' + ' '.join(fin_uppercase) + \
-                ' ' + ' '.join([twolc_escape(s) for s in fin_symbols]) +\
-                '; ' + '! Symbols for likely hyphenated words\n'
+            ' ' + ' '.join([twolc_escape(s) for s in fin_symbols]) +\
+            '; ' + '! Symbols for likely hyphenated words\n'
     elif ruleset == 'hyphenate' or ruleset == 'dehyphenate':
         twolcstring += 'Vowels = ' + ' '.join(fin_vowels) + ' ;' + \
-                '! Vowels\n'
+            '! Vowels\n'
         twolcstring += 'Consonants = ' + ' '.join(fin_consonants) + ' ;' + \
-                '! Consonants\n'
+            '! Consonants\n'
     elif ruleset == 'apertium':
         pass
     else:
@@ -111,22 +116,24 @@ def format_sets_twolc(format, ruleset):
     twolcstring += 'DUMMYSETCANBEUSEDTOTESTBUGS = a b c ;\n'
     return twolcstring
 
+
 def format_definitions_twolc(format, ruleset):
     twolcstring = 'Definitions\n'
     if ruleset == 'hyphenate':
         twolcstring += 'WordBoundary = [ %- | :%- | ' \
-                + twolc_escape(word_boundary) + ':0 | #: | .#. ] ;\n'
+            + twolc_escape(word_boundary) + ':0 | #: | .#. ] ;\n'
     elif ruleset == 'dehyphenate':
         twolcstring += 'WordBoundary = [ %- | :%- | ' \
-                + twolc_escape(word_boundary) + ' | # | .#. ] ;\n'
+            + twolc_escape(word_boundary) + ' | # | .#. ] ;\n'
         twolcstring += 'WeakBoundary = [ ' \
-                + twolc_escape(weak_boundary) + ' | ' \
-                + twolc_escape(deriv_boundary) + ' | '  \
-                + twolc_escape(morph_boundary) + ' | ' \
-                + twolc_escape(stub_boundary)  + ' | ' \
-                + twolc_escape(morph_boundary) + ' ] ;\n'
+            + twolc_escape(weak_boundary) + ' | ' \
+            + twolc_escape(deriv_boundary) + ' | '  \
+            + twolc_escape(morph_boundary) + ' | ' \
+            + twolc_escape(stub_boundary)  + ' | ' \
+            + twolc_escape(morph_boundary) + ' ] ;\n'
     twolcstring += 'DUMMYDEFINITIONCANBEUSEDTOTESTBUGS = a | b | c ;\n'
     return twolcstring
+
 
 def format_rules_twolc(format, ruleset):
     twolcstring = "Rules\n"
@@ -142,9 +149,9 @@ def format_rules_twolc(format, ruleset):
     elif ruleset == 'hyphens':
         twolcstring += '"Disallow no hyphen between equal vowels"\n'
         twolcstring += twolc_escape(optional_hyphen) + ':0 /<= ' + \
-                "VOWEL :0* _ :0* VOWEL ; where VOWEL in Vowels matched ;\n"
+            "VOWEL :0* _ :0* VOWEL ; where VOWEL in Vowels matched ;\n"
     elif ruleset == 'hyphenate':
-        twolcstring += '"Hyphenate before consonant clusters"\n'
+        twolcstring += '"Hyphenate Before consonant clusters"\n'
         twolcstring += "0:%-2 <=> Vowels (Consonants) (Consonants) _ Consonants Vowels ;\n"
         twolcstring += '"Hyphenate between non-diphtongs"\n'
         twolcstring += "0:%-3 <=> Vx _ Vy ;\n"
