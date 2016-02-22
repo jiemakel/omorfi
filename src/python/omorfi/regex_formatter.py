@@ -27,7 +27,7 @@ from .twolc_formatter import twolc_escape
 
 def format_rules_regex(formatter, ruleset):
     regexstring = ''
-    if ruleset == 'orthographic-variations':
+    if ruleset == 'orthographic-variations' or ruleset == 'orthographic-variations-emf':
         regexstring += '[ '
         for p in fin_orth_pairs:
             regexstring += twolc_escape(p[0]) + ':' + twolc_escape(p[1]) + \
