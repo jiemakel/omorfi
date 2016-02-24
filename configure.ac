@@ -140,6 +140,18 @@ AM_CONDITIONAL([WANT_LABELED_SEGMENTS], [test "x$enable_labeled_segments" = xyes
 
 # applications
 # segmenter currently based on FTB 3
+AC_ARG_ENABLE([monodix],
+              [AS_HELP_STRING([--enable-monodix],
+                              [generate monodix XML @<:@default=yes@:>@])],
+                              [enable_monodix=$enableval],
+                              [enable_monodix=yes])
+AM_CONDITIONAL([WANT_MONODIX], [test x$enable_monodix != xno])
+AC_ARG_ENABLE([kotus_wordlist],
+              [AS_HELP_STRING([--enable-kotus-wordlist],
+                              [generate wordlist in kotus XML format @<:@default=yes@:>@])],
+                              [enable_kotus_wordlist=$enableval],
+                              [enable_kotus_wordlist=yes])
+AM_CONDITIONAL([WANT_KOTUS_WORDLIST], [test x$enable_kotus_wordlist != xno])
 AC_ARG_ENABLE([acceptor],
               [AS_HELP_STRING([--enable-acceptor],
                               [generate acceptor @<:@default=yes@:>@])],
@@ -406,6 +418,8 @@ Configured $PACKAGE_STRING:
     * labeled segmenter: $enable_labeled_segments
 * Applications
     * Voikko speller: $enable_voikko
+    * Monodix XML: $enable_monodix
+    * Wordlist in Kotus XML format: $enable_kotus_wordlist
     * acceptor: $enable_acceptor
     * tokeniser: $enable_tokeniser
     * segmenter: $enable_segmenter

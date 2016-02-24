@@ -243,7 +243,13 @@ AM_PY_LOG_FLAGS=-m omorfi
 PY_LOG_COMPILER=$(PYTHON)
 
 # These aren't installed but generated
-noinst_DATA=generated/omorfi.dix generated/omorfi-sanalista.xml
+noinst_DATA=
+if WANT_MONODIX
+noinst_DATA+=generated/omorfi.dix
+endif
+if WANT_KOTUS_WORDLIST
+noinst_DATA+=generated/omorfi-sanalista.xml
+endif
 
 # Things that make clean isn't smart enought to wipe
 CLEANFILES=$(GENERIC_GENERATED) $(FTB3_GENERATED) $(DB_GENERATED) \
