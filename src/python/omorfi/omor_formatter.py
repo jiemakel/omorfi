@@ -244,6 +244,7 @@ class OmorFormatter(Formatter):
         '[VOICE=ACT]',
         '[VOICE=PSS]',
         '[WORD_ID=',
+        '[SEGMENT=',
         "[FOREIGN=FOREIGN]"
     }
 
