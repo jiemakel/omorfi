@@ -69,7 +69,7 @@ AC_ARG_ENABLE([omor_proper_classes],
                               [include proper feature in omors @<:@default=enable@:>@])],
                               [enable_omor_proper_classes=$enableval],
                               [enable_omor_proper_classes=yes])
-AS_IF([test enable_omor_proper_classes != xno],
+AS_IF([test x$enable_omor_proper_classes != xno],
       [AC_SUBST([OMORPROPFLAG], ["--omor-props"])])
 AC_ARG_ENABLE([omor_semantics],
               [AS_HELP_STRING([--enable-omor-semantics],
