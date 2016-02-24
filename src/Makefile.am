@@ -1240,7 +1240,7 @@ generated/temporary.omor.subst.nocompounds.hfst: generated/temporary.omor.subst.
 	$(HMIN) $(HFST_FLAGS) -o $@
 
 generated/omorfi-omor.analyse.guess.hfst: generated/temporary.omor.subst.nocompounds.hfst
-	hfst-guessify $(HFST_FLAGS) $< | \
+	hfst-guessify $(HFST_FLAGS) -G $< | \
 	$(HF2F) $(HFST_FLAGS) -f olw -o $@
 
 # }}}
