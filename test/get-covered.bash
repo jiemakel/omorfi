@@ -1,6 +1,6 @@
 #!/bin/bash
 # fetch omorfi coverage corpus data
-nc=8
+nc=9
 function preprocess() {
     cat $@ | sed -e 's/[[:punct:]][[:space:][:punct:]]/ \0/g' \
         -e 's/[[:punct:]]\r\?$/ \0/' -e 's/^[[:punct:]]/\0 /' \
@@ -130,7 +130,7 @@ if ! test -f "fi-ud-test.uniq.freqs" ; then
     echo count
     frequency_list "fi-ud-test.tokens" > "fi-ud-test.uniq.freqs"
 fi
-echo UD Finnish-FTB ... 7/$nc
+echo UD Finnish-FTB ... 8/$nc
 if ! test -f "fi_ftb-ud-test.uniq.freqs" ; then
     if ! test -f "fi_ftb-ud-test.conllu" ; then
         git clone git@github.com:UniversalDependencies/UD_Finnish-FTB.git
@@ -143,3 +143,27 @@ if ! test -f "fi_ftb-ud-test.uniq.freqs" ; then
     frequency_list "fi_ftb-ud-test.tokens" > "fi_ftb-ud-test.uniq.freqs"
 fi
 
+# CEMF
+echo CEMF ... 9/$nc
+if ! test -f "cemf.uniq.freqs" ; then
+    if ! test -f "cemf.tokens" ; then
+        if ! test -d "cemf" ; then
+            echo fetch
+            ./fetch-cemf.bash
+        fi
+        echo unpack
+        ./unpack-cemf.bash "cemf" > "cemf.text"
+        echo tokenise
+        preprocess < "cemf.text" > "cemf.tokens"
+        for f in cemf/*.txt
+        do
+          preprocess < $f > $f.tokens
+        done
+    fi
+    echo count
+    frequency_list cemf.tokens > cemf.uniq.freqs
+    for f in cemf/*.tokens
+    do
+      frequency_list $f > $f.uniq.freqs
+    done
+fi

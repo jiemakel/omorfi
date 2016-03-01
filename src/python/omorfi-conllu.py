@@ -207,7 +207,7 @@ def format_feats_ud(anal, hacks=None):
                 print("in", anal[0])
                 exit(1)
         elif key in ['UPOS', 'ALLO', 'WEIGHT', 'CASECHANGE',
-                     'GUESS', 'PROPER', 'POSITION', 'SEM', 'CONJ']:
+                     'GUESS', 'PROPER', 'POSITION', 'SEM', 'CONJ','SEGMENT','DIALECT','KTN','KAV']:
             # Not feats in UD:
             # * UPOS is another field
             # * Allomorphy is ignored

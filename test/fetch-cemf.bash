@@ -21,6 +21,8 @@ mv cemf/sanakirja1883-1890.xml cemf-dict
 mv cemf/socknenamn1853.xml cemf-dict
 mv cemf/ticklen_terminimedici1832.xml cemf-dict
 mv cemf/hoijerin_soitanto1877.xml cemf-dict
+mv cemf/tulkkijatk_1847.xml cemf-dict
+mv cemf/suomalainen_puhuttelija1860.xml cemf-dict
 python3 wordlists_from_dictionary_xml.py
 for f in cemf-dict/*.txt
 do

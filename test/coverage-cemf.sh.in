@@ -18,7 +18,16 @@ if ! test -x @PYTHON@ ; then
     echo python missing, cannot run tests
     exit 77
 fi
+code=0
 echo Looking up cemf.tokens
-if ! @PYTHON@ coverage.py -f $fsa -i $cuf -c 2 -o cemf.coveragelog -t 60 ; then
-    exit 1
+if ! @PYTHON@ coverage.py -f $fsa -i $cuf -c 2 -o cemf.coveragelog -t 90 ; then
+    code=1
 fi
+for f in cemf/*.uniq.freqs
+do
+    echo Looking up $f
+    if ! @PYTHON@ coverage.py -f $fsa -i $f -c 1 -o $f.coveragelog -t 71 ; then
+	     code=1
+    fi
+done
+exit $code

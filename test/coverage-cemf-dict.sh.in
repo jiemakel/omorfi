@@ -21,7 +21,7 @@ code=0
 for f in cemf-dict/*.txt
 do
     echo Looking up $f
-    if ! @PYTHON@ coverage.py -f $fsa -i $f -c 1 -o cemf-dict.coveragelog -t 60 ; then
+    if ! @PYTHON@ coverage.py -f $fsa -i $f -c 1 -o $f.coveragelog -t 42 ; then
 	code=1
     fi
 done

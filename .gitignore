@@ -1,4 +1,5 @@
 *.coveragelog
+*.log
 *.trs
 *.hfst
 *.pyc
@@ -85,12 +86,16 @@ test/fetch-gutenberg.bash
 test/fetch-jrc-acquis.bash
 test/fetch-tatoeba.bash
 test/fetch-wikimedia.bash
+test/UD-Finnish*
 test/*.freqs
 test/*.tsv
 test/*.conllx
 test/*.faithlog
 test/html-entity-names.sed
 test/xml-entity-codes.sed
+test/wordforms.anals
+test/unescape-xmlish-entities.py
+test/*.conllu
 src/generated
 src/voikko/index.xml
 src/voikko/speller-omorfi.zhfst
