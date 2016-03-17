@@ -73,6 +73,9 @@ def main():
                     help="exclude all XPOS parts of speech from generation")
     ap.add_argument("--include-lemmas", "-I", action="append", type=open,
                     metavar="ILFILE", help="read lemmas to include from ILFILE")
+    ap.add_argument("--exclude-blacklisted", "-B", action="append", type=str,
+                    metavar="BLIST", help="exclude lemmas in BLIST blacklist",
+                    choices=["FGK", "PROPN-BLOCKING"])
     ap.add_argument("--version", "-V", action="version")
     ap.add_argument("--output", "-o", "--one-file", "-1",
                     type=argparse.FileType("w"), required=True,
@@ -195,6 +198,9 @@ def main():
                 if args.include_lemmas:
                     if wordmap['lemma'] not in lemmas:
                         continue
+                if args.exclude_blacklisted:
+                    if wordmap['blacklist'] in args.exclude_blacklisted:
+                        continue
                 # choose correct lexicon
                 incoming_lexicon = tsv_parts['upos']
                 if tsv_parts['is_suffix']:
@@ -219,7 +225,7 @@ def main():
                 for suffix in postponed_suffixes:
                     print(formatter.wordmap2lexc(suffix),
                           file=args.output)
-            for key, words in postponed_abbrs.items():
+            for key, words in sorted(postponed_abbrs.items()):
                 print("\nLEXICON", key, "\n\n", file=args.output)
                 for word in words:
                     print(formatter.wordmap2lexc(word),
