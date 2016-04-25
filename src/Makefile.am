@@ -161,6 +161,10 @@ if WANT_GUESSER
 OMOR_AUTOMATA+=generated/omorfi-omor.analyse.guess.hfst
 endif
 
+if WANT_FUZZY
+OMOR_AUTOMATA+=generated/omorfi-omor.analyse.fuzzy.hfst
+endif
+
 OMOR_GENERATED=generated/omorfi-omor.lexc \
 			   generated/omorfi-omor.reweight \
 			   generated/omorfi-omor-tests.yaml \
@@ -1251,12 +1255,20 @@ generated/temporary.omor.subst.hfst: generated/temporary.omor.hfst generated/dec
 	$(HSUB) -F generated/decl_substitutions.regex -o $@ $<
 
 generated/temporary.omor.subst.nocompounds.hfst: generated/temporary.omor.subst.hfst
-	echo "[ ? - %[BOUNDARY%=COMPOUND%] ]*" | hfst-regexp2fst > generated/filter_compounds.regex.hfst
+	echo "[ ? - %[BOUNDARY%=COMPOUND%] ]*" | $(HREGEX) $(HFST_FLAGS) > generated/filter_compounds.regex.hfst
 	$(HCOMP) $(HFST_FLAGS) -1 $< -2 generated/filter_compounds.regex.hfst | \
 	$(HMIN) $(HFST_FLAGS) -o $@
 
 generated/omorfi-omor.analyse.guess.hfst: generated/temporary.omor.subst.nocompounds.hfst
-	hfst-guessify $(HFST_FLAGS) -G $< | \
+	hfst-guessify $(HFST_FLAGS) -G $< -o $@
+
+generated/omorfi-omor.analyse.fuzzy.hfst: generated/temporary.omor.hfst generated/errmodel.edit-distance-2.regex.hfst
+	echo "?* - ?*%[WORD%_ID%=??%]?*%[BOUNDARY%=COMPOUND%]?*" | $(HREGEX) $(HFST_FLAGS) > generated/filter_short_compounds.regex.hfst
+	$(HCOMP) $(HFST_FLAGS) -1 generated/temporary.omor.hfst -2 generated/filter_short_compounds.regex.hfst |\
+	$(HINV) $(HFST_FLAGS) |\
+	$(HCOMP) $(HFST_FLAGS) -2 generated/errmodel.edit-distance-2.regex.hfst |\
+	$(HINV) $(HFST_FLAGS) |\
+	$(HMIN) $(HFST_FLAGS) |\
 	$(HF2F) $(HFST_FLAGS) -f olw -o $@
 
 # }}}
@@ -1288,24 +1300,16 @@ generated/omorfi-giella.generate.hfst: generated/temporary-giella.analyse.hfst
 # }}}
 # {{{SPELL-CHECKING
 # voikko speller HFST beta targets'
-generated/errmodel.edit-distance.txt: python/generate-edit-distance.py
-	$(PYTHON) $< -o $@
+generated/errmodel.edit-distance-2.regex: python/generate-edit-distance.py
+	$(PYTHON) $< -r 2 -o $@
 
-generated/errmodel.edit-distance-1.hfst: generated/errmodel.edit-distance.hfst
-	$(HMIN) $< -o $@
-
-generated/errmodel.edit-distance-2.hfst: generated/errmodel.edit-distance.hfst
-	$(HMIN) $< |\
-		$(HREP) -f 1 -t 2 -o $@
-
-generated/errmodel.edit-distance-3.hfst: generated/errmodel.edit-distance.hfst
-	$(HMIN) $< |\
-		$(HREP) -f 1 -t 3 -o $@
+generated/errmodel.edit-distance-1.regex: python/generate-edit-distance.py
+	        $(PYTHON) $< -r 1 -o $@
 
 voikko/acceptor.default.hfst: generated/omorfi.accept.hfst
 	$(HF2F) -f olw < $< > $@
 
-voikko/errmodel.default.hfst: generated/errmodel.edit-distance-2.hfst
+voikko/errmodel.default.hfst: generated/errmodel.edit-distance-2.regex.hfst
 	$(HF2F) -f olw < $< > $@
 
 voikko/speller-omorfi.zhfst: voikko/index.xml \

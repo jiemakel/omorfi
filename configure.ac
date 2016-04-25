@@ -105,6 +105,12 @@ AC_ARG_ENABLE([omor_guesser],
                               [enable_omor_guesser=$enableval],
                               [enable_omor_guesser=no])
 AM_CONDITIONAL([WANT_GUESSER], [test "x$enable_omor_guesser" != xno])
+AC_ARG_ENABLE([omor_fuzzy],
+              [AS_HELP_STRING([--enable-omor-fuzzy],
+                              [generate fuzzy automata @<:@default=disable@:>@])],
+                              [enable_omor_fuzzy=$enableval],
+                              [enable_omor_fuzzy=no])
+AM_CONDITIONAL([WANT_FUZZY], [test "x$enable_omor_fuzzy" != xno])
 # generic tagset switch to override (for lexc serialisation)
 AC_ARG_ENABLE([ftb1],
               [AS_HELP_STRING([--enable-ftb1],
@@ -412,6 +418,7 @@ Configured $PACKAGE_STRING:
         * colloquial Finnish support: $enable_colloq
     * OMOR: $enable_omor $OMORPROPFLAG $OMORALLOFLAG $OMORPARAFLAG $OMORSEMFLAG $OMORKTNKAVFLAG $OMORDIALECTSFLAG $OMORSEGMENTSFLAG
         * guesser: $enable_omor_guesser (needs --enable-omor-ktnkav)
+	* fuzzy matcher: $enable_omor_fuzzy
     * FTB3.1: $enable_ftb3
     * apertium: $enable_apertium
     * giella: $enable_giella

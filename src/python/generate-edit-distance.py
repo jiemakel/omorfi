@@ -47,6 +47,8 @@ def main():
                     help="weight each swap SW")
     ap.add_argument("--change", "-c", type=float, default=1.0, metavar="CW",
                     help="weight each change CW")
+    ap.add_argument("--repeat", "-r", type=int, default=2, metavar="REP",
+                    help="repeat REP")
     ap.add_argument("--output", "-o", type=argparse.FileType("w"),
                     required=True, metavar="OFILE", help="write output to OFILE")
 
@@ -58,24 +60,10 @@ def main():
     # print definitions to rootfile
     if args.verbose:
         print("Creating EDs")
-    print(0, 0.0, sep="\t", file=args.output)
-    for c in fin_lowercase + fin_uppercase + fin_symbols:
-        print(0, 0, c, c, 0.0, sep="\t", file=args.output)
-        print(0, 1, c, "@_EPSILON_SYMBOL_@", args.deletion, sep="\t",
-              file=args.output)
-        print(0, 1, "@_EPSILON_SYMBOL_@", c, args.addition, sep="\t",
-              file=args.output)
-        print(1, 1, c, c, 0.0, sep="\t", file=args.output)
-    print("%d\t%f\n", 0, 0.0, sep="\t", file=args.output)
-    # generate swaps
-    i = 2
-    for c in fin_lowercase:
-        for g in fin_lowercase:
-            print(0, i, c, g, 0.0, sep="\t", file=args.output)
-            print(i, 1, g, c, args.swap, sep="\t", file=args.output)
-            print(i, args.change, sep="\t", file=args.output)
-            i += 1
-
+    out = "?*"
+    for i in range(args.repeat):
+        out +=" ([?:0::1000 - 0]) ?*"
+    print(out,file=args.output)
     exit(0)
 
 
