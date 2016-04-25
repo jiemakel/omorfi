@@ -27,14 +27,14 @@ Taivutukseen liittyvät muutokset on koottu continuations/inflections-emf.tsv -t
   NOUN_BACK_WEAK_PLURALS_ARCHAIC	Uarch		NOUN_BACK_WEAK_PLURALS
 
 1. Murteellisista tai vanhanaikaisista taivutuspäätteistä. Lisätyt muotoryhmät:
-  1. Inessiivi [615]
+  1. Inessiivi [615] {ssA, sA, s, s'}
     1. Yksinäis-s:lliset inessiivit ("autosa")
     1. Loppuheitolliset inessiivit ("autos")
-  1. Illatiivi [617]
+  1. Illatiivi [617] {sen, en}
     1. Yksinäis-e:lliset een-illatiivit ("harmaasen")
-  1. Allatiivi [620]
+  1. Allatiivi [620] {llen}
     1. loppu-n:lliset illatiivit ("autollen")
-  1. Adessiivi [618]
+  1. Adessiivi [618] {l', l, lla}
     1. loppuheitolliset adessiivit ("autol")
 
 1. Murteellisista tai vanhanaikaisista liitepartikkeleista
@@ -43,16 +43,22 @@ Taivutukseen liittyvät muutokset on koottu continuations/inflections-emf.tsv -t
 ## Vartalotaivutukseen liittyvät muutokset
 
 1. t:n heikko aste
-  1. katomuodot (sota -> sodan / soan)
-  1. j-variantti (sota -> sodan / sojan)
+  1. vokaalin jäljessä [421]
+	1.1. kato (sota : sodan / soan)	
+  	1.2. j-variantti (sota : sodan / sojan)
+  2. h:n jälkeen [520]
+  	2.1. kato (yksi : yhden / yhen) 
 
-1. k:n heikko aste
-  1. g-variantti (alku -> alun / algun)
-  1. '-variantti i:n jälkeen (aika -> ajan / a'an)
-  1. h-variantti s:n edellä (haaksi -> haaksen / haahen)
+1. k:n astevaihtelu 
+  1. likvidan (esim. l) jälkeen [390 edustaa kaikkia tyyppejä vokaalista riippumatta] {l, lg}
+  	1.1. g-variantti (alku -> alun / algun)  
+  2. i-loppuisen diftongin jälkeen [372 edustaa kaikkia tyyppejä jälkivokaalista riippumatta] {j, ', }
+  	2.1 '-variantti (aika -> ajan / a'an)
+  1. h-variantti s:n edellä (haaksi -> haaksen / haahen) --> siirretään käsiteltäväksi osana t:n heikkoa astetta, vrt. yksi->yhden:yhen
 
-1. eA-adjektiivit
+1. eA-adjektiivit [025] {eA, ee, iA}
   1. ee-variantti (korkea / korkee)
+  2. iA-variantti (korkea / korkia) ei ole lisätty tässä vaiheessa, sillä omorfissa morfeemiraja kulkee vartalovokaali-e:n kohdalla ja muutos edellyttäisi uusien i-vartalollisten lekseemiartikkelien lisäämistä kaikille ao. lekseemeille.
 
 ## Sananjohtamiseen liittyvät muutokset
 
