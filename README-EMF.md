@@ -27,14 +27,14 @@ Taivutukseen liittyvät muutokset on koottu continuations/inflections-emf.tsv -t
   NOUN_BACK_WEAK_PLURALS_ARCHAIC	Uarch		NOUN_BACK_WEAK_PLURALS
 
 1. Murteellisista tai vanhanaikaisista taivutuspäätteistä. Lisätyt muotoryhmät:
-  1. Inessiivi
+  1. Inessiivi [615]
     1. Yksinäis-s:lliset inessiivit ("autosa")
     1. Loppuheitolliset inessiivit ("autos")
-  1. Illatiivi
+  1. Illatiivi [617]
     1. Yksinäis-e:lliset een-illatiivit ("harmaasen")
-  1. Allatiivi
+  1. Allatiivi [620]
     1. loppu-n:lliset illatiivit ("autollen")
-  1. Adessiivi
+  1. Adessiivi [618]
     1. loppuheitolliset adessiivit ("autol")
 
 1. Murteellisista tai vanhanaikaisista liitepartikkeleista
