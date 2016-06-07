@@ -47,7 +47,9 @@ Taivutukseen liittyvät muutokset on koottu continuations/inflections-emf.tsv -t
 	1.1. kato (sota : sodan / soan)	
   	1.2. j-variantti (sota : sodan / sojan)
   2. h:n jälkeen [520]
-  	2.1. kato (yksi : yhden / yhen) 
+  	2.1. kato (yksi : yhden / yhen)
+  3. likvidan tai nasaalin jälkeen [420]  *** tekemättä
+  	3.1. d ( multa / mulda )
 
 1. k:n astevaihtelu 
   1. likvidan (esim. l) jälkeen [390 edustaa kaikkia tyyppejä vokaalista riippumatta] {l, lg}
