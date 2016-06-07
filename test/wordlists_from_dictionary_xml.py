@@ -188,26 +188,34 @@ def analyse_tree(filename):
                 UnboundLocalError
                 print(ET.tostring(child))
 
-    try:
-        text = text.find('div').find('p')
-        entries = text.findall('s')
+    if text.find('div'):
+        entries = text.find('div').findall('p/s')
         print(filename, len(entries))
+        count = 0
         for entry in entries:
-            text = re.sub("[\t\n]", "", entry.text)
-            entry_name = re.split("\*", text)[0]
-            entry_name = re.split(" ", entry_name)
-            if len(entry_name) == 0:
-                entry_name = entry_name[0]
-                parts = re.split(" ", re.split("\*", text)[1])
-                for x in parts:
-                    if x in pos_replacements: pos = x
+            if entry.text.startswith("'flipa"):break
+            entry_name = re.split(" ", entry.text)[0]
+            if " " not in entry.text: count += 1
+            else:
+                entry_data = " ".join(re.split(" ", entry.text)[1:])
+                pos = None
+                if entry.text.endswith(" n.") or entry.text.endswith(" f.") or entry.text.endswith(" m."): pos = "N"
+                else:
+                    x = ""
+                    for i in range(0, len(re.split(" ", entry_data))):
+                        split = re.split(" ", entry_data)[i]
+                        if split.endswith("."): x += split
+                        elif x != "": break
+                    if x in pos_replacements and x != "":
+                        pos = pos_replacements[x]
+                    elif x.startswith("v."): pos = "V"
+                    elif x.startswith("n.") or x.startswith("f.") or x.startswith("m."): pos = "N"
+                    elif x.startswith("adj.") or x.startswith("a."): pos = "A"
+                    elif x.startswith("adv."): pos ="other"
+                if pos == None:
+                    pos = "UNK"
                 write_to_file(filename, pos, entry_name)
-    except:
-        AttributeError
-
-
-
-
+        print(count, "un-analysed in", filename)
 
 def write_to_file(filename, pos, entry):
     entry = fix_entry_name(entry)
