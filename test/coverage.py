@@ -21,6 +21,8 @@ def main():
     a.add_argument('-o', '--output', metavar="outFILE", type=FileType('w'),
             required=True,
             dest="outfile", help="log file name")
+    a.add_argument('-mo', '--match-output', metavar="matchoutFILE", type=FileType('w'),
+            dest="matchoutfile",help="log file name for outputting matches")
     a.add_argument('-v', '--verbose', action="store_true", default=False,
             help="Print verbosely while processing")
     a.add_argument('-c', '--count', metavar="FREQ", default=0,
@@ -64,6 +66,8 @@ def main():
         if len(anals) > 0:
             found_tokens += freq
             found_uniqs += 1
+            if (options.matchoutfile):
+                print(freq, surf, anals, sep="\t", file=options.matchoutfile)
         else:
             missed_tokens += freq
             missed_uniqs += 1
