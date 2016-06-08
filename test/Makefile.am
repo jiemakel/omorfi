@@ -10,6 +10,8 @@ TESTS=rough-tests.sh scripts-runnable.sh \
 	  coverage-fiwiki.sh \
 	  coverage-fi-ud.sh \
 	  coverage-fi-ftb-ud.sh \
+	  coverage-opensubtitles.bash \
+	  coverage-tatoeba.bash \
 	  coverage-cemf.sh \
 	  coverage-cemf-dict.sh \
 	  faithfulness-ftb-3.1.sh \

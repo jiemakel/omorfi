@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CLI stuff
-from sys import stderr, stdin, stdout
 from argparse import ArgumentParser, FileType
-# omorfi
-from omorfi.omorfi import Omorfi
+# CLI stuff
+from sys import stdin, stdout
 # statistics
 from time import perf_counter, process_time
-# string munging
-import re
+
+# omorfi
+from omorfi.omorfi import Omorfi
 
 
 def main():
@@ -58,6 +57,8 @@ def main():
     for line in options.infile:
         line = line
         lines += 1
+        if options.verbose and lines % 10000 == 0:
+            print(lines, "...")
         if not line or line.rstrip('\n') == '':
             continue
         surfs = omorfi.tokenise(line)

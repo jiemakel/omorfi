@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CLI stuff
-from sys import stderr, stdin, stdout
-from argparse import ArgumentParser, FileType
-# omorfi
-from omorfi.omorfi import Omorfi
-# statistics
-from time import perf_counter, process_time
 # string munging
 import re
+from argparse import ArgumentParser, FileType
+# CLI stuff
+from sys import stderr, stdin, stdout
+# statistics
+from time import perf_counter, process_time
+
+# omorfi
+from omorfi.omorfi import Omorfi
 
 
 def get_lemmas(anal):
@@ -265,9 +266,17 @@ def format_third_tdt(upos):
         return 'X'
 
 
+def get_upos(anal):
+    upos = get_last_feat("UPOS", anal)
+    drv = get_last_feat("DRV", anal)
+    if upos == 'VERB' and drv == 'MINEN':
+        upos = 'NOUN'
+    return upos
+
+
 def try_analyses_conllu(original, wordn, surf, anals, outfile, hacks=None):
     for anal in anals:
-        upos = get_last_feat("UPOS", anal)
+        upos = get_upos(anal)
         if upos == original[3]:
             feats = format_feats_ud(anal)
             if feats == original[5]:
@@ -276,14 +285,14 @@ def try_analyses_conllu(original, wordn, surf, anals, outfile, hacks=None):
                     return print_analyses_conllu(wordn, surf, anal, outfile, hacks)
     # no exact match found (re-try without lemma)
     for anal in anals:
-        upos = get_last_feat("UPOS", anal)
+        upos = get_upos(anal)
         if upos == original[3]:
             feats = format_feats_ud(anal)
             if feats == original[5]:
                 return print_analyses_conllu(wordn, surf, anal, outfile, hacks)
     # and re-try without feats
     for anal in anals:
-        upos = get_last_feat("UPOS", anal)
+        upos = get_upos(anal)
         if upos == original[3]:
             return print_analyses_conllu(wordn, surf, anal, outfile, hacks)
     return print_analyses_conllu(wordn, surf, anals[0], outfile, hacks)

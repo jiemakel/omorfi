@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
-from sys import stdin, stdout
-from argparse import ArgumentParser
-from omorfi.omorfi import Omorfi
 import re
+from argparse import ArgumentParser
+from sys import stderr, stdin, stdout
+
+from omorfi.omorfi import Omorfi
 
 
-def print_moses_factor_segments(segments, labelsegments, surf, outfile):
+def print_moses_factor_segments(segments, labelsegments, surf, outfile,
+                                options):
     if float(labelsegments[0][1]) != float('inf'):
         analysis = labelsegments[0][0]
         splat = re.split("[]{}[]", analysis)
@@ -31,7 +33,8 @@ def print_moses_factor_segments(segments, labelsegments, surf, outfile):
                     skiptag = None
                 moses += ' '
                 nextsep = '|'
-            elif split in ['NOUN', 'VERB', 'ADJ', 'COMP', 'PROPN', 'SUPER', 'AUX', 'NUM', 'PRON', 'DET']:
+            elif split in ['NOUN', 'VERB', 'ADJ', 'COMP', 'PROPN',
+                           'SUPER', 'AUX', 'NUM', 'PRON', 'DET']:
                 allow_uppers = True
                 skiptag = split
             elif split in ['ADV', 'ADP', 'X', 'PUNCT', 'CONJ',
@@ -95,7 +98,7 @@ def print_moses_factor_segments(segments, labelsegments, surf, outfile):
         moses = re.sub(r"v\|PCPVA([a-zaä]+)", r"v\1|PCPVA", moses)
         moses = re.sub(r"v\|VERB\.PCPVA([aä])", r"v\1|VERB.PCPVA", moses)
         moses = re.sub(r"v\|AUX.PCPVA([aä])", r"v\1|AUX.PCPVA", moses)
-        #|PCPMATONön
+        # |PCPMATONön
         moses = re.sub(r"\|PCPMATON([a-zåäö]+)", r"\1|PCPMATON", moses)
         # puhu|VERB ma|NOUN an|INFMA.ILL
         moses = re.sub(r"(m[aä])\|NOUN ([aä]n)\|INFMA.ILL",
@@ -163,10 +166,12 @@ def print_moses_factor_segments(segments, labelsegments, surf, outfile):
         # kehitys|NOUN yhteis|NOUN työ mis|NOUNnisteri|NOUN nä|ESS
         # ulko|NOUN maalai|NOUN s|NOUN viha mielis|ADJ tä|PAR
         # epä|NOUN tasa-arvo asia|NOUN
-        moses = re.sub(r"([a-zéšäöå-]+)\|NOUN ([a-zšéäöå-]+) ([a-zšéäöå]+)\|NOUN",
-                       r"\1|NOUN \2|NOUN \3|NOUN", moses)
-        moses = re.sub(r"([a-zéšäöå-]+)\|NOUN ([a-zšéäöå-]+) ([a-zšéäöå]+)\|ADJ",
-                       r"\1|NOUN \2|NOUN \3|ADJ", moses)
+        moses = re.sub(
+            r"([a-zéšäöå-]+)\|NOUN ([a-zšéäöå-]+) ([a-zšéäöå]+)\|NOUN",
+            r"\1|NOUN \2|NOUN \3|NOUN", moses)
+        moses = re.sub(
+            r"([a-zéšäöå-]+)\|NOUN ([a-zšéäöå-]+) ([a-zšéäöå]+)\|ADJ",
+            r"\1|NOUN \2|NOUN \3|ADJ", moses)
         # šakki lauda|NOUN
         # pöytä|NOUN rosé viine|NOUN i|PL stä|ELA
         # linja-auto liikentee|NOUN n|GEN
@@ -201,6 +206,26 @@ def print_moses_factor_segments(segments, labelsegments, surf, outfile):
         moses = re.sub(r"\|NOUN([a-zäåö]+)\|NOUN", r"\1|NOUN", moses)
         # || special case :-/
         moses = re.sub(r"\|\|SYM", "@pipe;|SYM", moses)
+        # finally
+        segleft = ''
+        segright = ''
+        seglen = len(options.segment_marker)
+        if seglen == 0:
+            segleft = ''
+            segright = ''
+        elif seglen == 1:
+            segleft = options.segment_marker
+            segright = options.segment_marker
+        elif seglen % 2 == 0:
+            segleft = options.segment_marker[:int(seglen / 2)]
+            segright = options.segment_marker[int(seglen / 2):]
+        else:
+            segleft = options.segment_marker[:int((seglen - 1) / 2)]
+            segright = options.segment_marker[int((seglen - 1) / 2):]
+        moses = re.sub(r"\|", segleft + "|", moses)
+        moses = re.sub(r" ", " " + segright, moses)
+        last = moses.rfind(segleft + "|")
+        moses = moses[:last + len(segleft) - 1] + moses[last + len(segleft):]
         print(moses, end=' ', file=outfile)
     else:
         print(surf, end='|UNK ', file=outfile)
@@ -266,7 +291,7 @@ def main():
                    help="split on derivation boundaries")
     a.add_argument('--split-nonwords', action="store_true", default=False,
                    help="split on other boundaries")
-    a.add_argument('--segment-marker', default=' ', metavar='SEG',
+    a.add_argument('--segment-marker', default='→ ←', metavar='SEG',
                    help="mark segment boundaries with SEG")
     options = a.parse_args()
     omorfi = Omorfi(options.verbose)
@@ -282,11 +307,17 @@ def main():
     if options.infile:
         infile = options.infile
     else:
+        options.infile = stdin
         infile = stdin
     if options.output:
         outfile = open(options.output, 'w')
     else:
+        options.output = "<stdout>"
         outfile = stdout
+    if options.segment_marker is None:
+        if options.verbose:
+            print("Default segment marker is → ←")
+        options.segment_marker = '→ ←'
     if options.verbose:
         print("reading from", options.infile.name)
     if options.verbose:
@@ -307,7 +338,7 @@ def main():
             labelsegments = omorfi.labelsegment(token[0])
             if options.output_format == 'moses-factors':
                 print_moses_factor_segments(
-                    segments, labelsegments, token[0], outfile)
+                    segments, labelsegments, token[0], outfile, options)
             elif options.output_format == 'segments':
                 print_segments(segments, labelsegments, token[0], outfile,
                                options)

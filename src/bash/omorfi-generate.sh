@@ -1,11 +1,10 @@
 #!/bin/bash
-omorfidir="@prefix@/lib/voikko/3/"
-omorfifile="$omorfidir/speller-omorfi.zhfst"
+source $(dirname $0)/omorfi.bash
 args=$@
 
 function print_version() {
-    echo "omorfi-spell 0.1"
-    echo "Copyright (c) 2014 Tommi A Pirinen"
+    echo "omorfi-generate 0.2 (using omorfi bash API ${omorfiapi})"
+    echo "Copyright (c) 2016 Tommi A Pirinen"
     echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
     echo "This is free software: you are free to change and redistribute it."
     echo "There is NO WARRANTY, to the extent permitted by law."
@@ -17,32 +16,14 @@ function print_usage() {
 }
 
 function print_help() {
-    echo "Analyse separate word-forms or word-form lists"
+    echo "Generates word-forms from line separated omorfi definitions"
     echo
     echo "  -h, --help      Print this help dialog"
     echo "  -V, --version   Print version info"
     echo "  -v, --verbose   Print verbosely while processing"
     echo
     echo "If no FILENAMEs are given, input is read from standard input."
-}
-
-
-function check_omorfi() {
-    if test ! -d "$omorfidir" ; then
-        echo omorfi not found in $omorfidir
-        exit 1
-    fi
-    if test ! -r "$omorfifile" ; then
-        echo analyser not found in $omorfifile
-        exit 1
-    fi
-    if test x$1 == xverbose ; then
-        echo using $omorfifile as analyser
-    fi
-}
-
-function spell() {
-    cat $@ | @HOSPELL@ "$omorfifile"
+    echo
 }
 
 if test x$1 == x-h -o x$1 == x--help ; then
@@ -55,10 +36,15 @@ elif test x$1 == x-V -o x$1 == x--version ; then
 elif test x$1 == x-v -o x$1 == x--verbose ; then
     verbose=verbose
     shift 1
-elif test ! -r $1 ; then
-    echo "Cannot read from $1"
-    print_usage
-    exit 1
+elif test x$1 == x--tagset ; then
+    tagset=$2
+    shift 2
 fi
-check_omorfi $verbose
-spell $@
+
+if test -z "$tagset" ; then
+    tagset=omor
+fi
+if test x$verbose = xverbose ; then
+    echo trying to generate using $tagset
+fi
+cat $@ | omorfi_generate $tagset

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-omorfidir="@prefix@/share/omorfi"
-omorfifile="$omorfidir/omorfi.segment.hfst"
+source $(dirname $0)/omorfi.bash
 args=$@
 
 marker=" "
@@ -9,8 +8,8 @@ markexpr=""
 unmarkexpr='\({STUB}\|{WB}\|{MB}\|{DB}\|{XB}\|{wB}\)'
 
 function print_version() {
-    echo "omorfi-segment 0.2"
-    echo "Copyright (c) 2015 Tommi A Pirinen"
+    echo "omorfi-segment 0.3 (using omorfi bash API $omorfiapi)"
+    echo "Copyright (c) 2016 Tommi A Pirinen"
     echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
     echo "This is free software: you are free to change and redistribute it."
     echo "There is NO WARRANTY, to the extent permitted by law."
@@ -40,26 +39,6 @@ function print_help() {
     echo "This program uses hfst-lookup"
 }
 
-
-function check_omorfi() {
-    if test ! -d "$omorfidir" ; then
-        echo omorfi not found in $omorfidir
-        exit 1
-    fi
-    if test ! -r "$omorfifile" ; then
-        echo analyser not found in $omorfifile
-        echo maybe you have disabled segmentation or installation was incomplete?
-        exit 1
-    fi
-    if test x$1 == xverbose ; then
-        echo using $omorfifile as analyser
-    fi
-}
-
-function analyse() {
-    cat $@ | @HLOOKUP@ "$omorfifile" |\
-        sed -e "s:${markexpr}:${marker}:g" -e "s/${unmarkexpr}//g"
-}
 
 while test $# -gt 0 ; do 
     if test x$1 == x-h -o x$1 == x--help ; then
@@ -116,6 +95,4 @@ else
     markexpr='\('${markexpr#\\\|}'\)'
 fi
 
-check_omorfi $verbose
-analyse $@
-
+cat $@ | omorfi_segment $marker $markexpr $unmarkexpr
