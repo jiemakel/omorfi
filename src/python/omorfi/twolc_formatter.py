@@ -2,9 +2,10 @@
 
 from sys import exit, stderr
 
-from .settings import (common_multichars, fin_consonants, fin_lowercase, fin_symbols, fin_uppercase, fin_vowels,
-                       newword_boundary, optional_hyphen, word_boundary,
-                       weak_boundary, deriv_boundary, morph_boundary, stub_boundary)
+from .settings import (common_multichars, deriv_boundary, fin_consonants, fin_lowercase, fin_symbols, fin_uppercase,
+                       fin_vowels, morph_boundary, newword_boundary, optional_hyphen, stub_boundary, weak_boundary,
+                       word_boundary)
+from .string_manglers import twolc_escape
 
 
 def format_copyright_twolc():
@@ -25,15 +26,6 @@ def format_copyright_twolc():
 ! You should have received a copy of the GNU General Public License
 ! along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-
-def twolc_escape(s):
-    '''Escape symbols that have special meaning in twolc.'''
-    s = s.replace("%", "__PERCENT__")
-    for c in ' @<>0!:";_^(){}-[]/?+|&*=$,':
-        s = s.replace(c, "%" + c)
-    s = s.replace("%_%_PERCENT%_%_", "%%")
-    return s
 
 
 def format_alphabet_twolc(format, ruleset):
@@ -130,7 +122,7 @@ def format_definitions_twolc(format, ruleset):
             + twolc_escape(weak_boundary) + ' | ' \
             + twolc_escape(deriv_boundary) + ' | '  \
             + twolc_escape(morph_boundary) + ' | ' \
-            + twolc_escape(stub_boundary)  + ' | ' \
+            + twolc_escape(stub_boundary) + ' | ' \
             + twolc_escape(morph_boundary) + ' ] ;\n'
     twolcstring += 'DUMMYDEFINITIONCANBEUSEDTOTESTBUGS = a | b | c ;\n'
     return twolcstring

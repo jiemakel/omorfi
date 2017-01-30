@@ -4,7 +4,7 @@ if test -z $srcdir ; then
     exit 1
 fi
 fsadir="../src/generated/"
-conllus="fi_ftb-ud-test.conllu"
+conllus="fi_ftb-ud.conllu"
 cs="get-covered.bash"
 if test ! -d "$fsadir" ; then
     echo Missing $fsadir
@@ -18,11 +18,11 @@ if test ! -r $conllus ; then
     echo missing $conllus, use $cs and re-try
     exit 77
 fi
-if ! /usr/bin/python3 ../src/python/omorfi-conllu.py -f $fsadir -i $conllus -o omorfi_ftb-ud-test.conllu -O --hacks=ftb ; then
+if ! /usr/bin/python3 ../src/python/omorfi-conllu.py -f $fsadir -i $conllus -o omorfi_ftb-ud.conllu -O --hacks=ftb ; then
     echo analysis failed
     exit 2
 fi
-if ! /usr/bin/python3 $srcdir/conllu-compare.py -H omorfi_ftb-ud-test.conllu -r fi_ftb-ud-test.conllu -l omorfi_ftb-ud-test.log -t 75 ; then
+if ! /usr/bin/python3 $srcdir/conllu-compare.py -H omorfi_ftb-ud.conllu -r fi_ftb-ud.conllu -l omorfi_ftb-ud.log -t 75 ; then
     echo We missed the target of 75 % conllu matches
     exit 1
 fi

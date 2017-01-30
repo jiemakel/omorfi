@@ -134,12 +134,14 @@ ADJ_YKSILÖITY	ADJ	ADJECTIVE	1	F	False	weaken	front	None	None	False	False
 ADJ_YLENNETTY	ADJ	ADJECTIVE	1	C	False	weaken	front	None	None	False	False
 ADJ_ÄLLISTYNYT	ADJ	ADJECTIVE	47	None	False	strengthen	front	y	None	False	False
 ADJ_ÖYKKÄRI	ADJ	ADJECTIVE	6	None	False	weaken	front	None	None	False	False
+ADP_ALLA	ADP	PARTICLE	99	None	False	False	back	None	None	optional	True
 ADP_ALLE	ADP	PARTICLE	99	None	False	False	back	None	None	optional	True
 ADP_HYVILLÄÄN	ADP	PARTICLE	99	None	False	False	front	None	None	obligatory	True
 ADP_ILKOSILLAAN	ADP	PARTICLE	99	None	False	False	back	None	None	obligatory	True
 ADP_ISTUALLEEN	ADP	PARTICLE	99	None	False	False	back	None	None	obligatory	True
 ADP_KOTONA	ADP	PARTICLE	99	None	False	False	back	None	None	optional	True
 ADP_LISÄKSI	ADP	PARTICLE	99	None	False	False	front	None	None	optional	True
+ADP_LÄHELLÄ	ADP	PARTICLE	99	None	False	False	front	None	None	optional	True
 ADP_MUKAAN	ADP	PARTICLE	99	None	False	False	back	None	None	optional	True
 ADP_MUKAISESTI	ADP	PARTICLE	99	None	False	False	back	None	None	optional	True
 ADP_NÄHDEN	ADP	PARTICLE	99	None	False	False	front	None	None	optional	True
@@ -374,6 +376,7 @@ NOUN_EKKE	NOUN	NOUN	8	A	False	weaken	front	None	None	False	False
 NOUN_ELIN	NOUN	NOUN	33	None	False	strengthen	front	None	None	False	False
 NOUN_ELÄMÄ	NOUN	NOUN	10	None	False	weaken	front	ä	None	False	False
 NOUN_EPÄILTY	NOUN	NOUN	1	I	False	weaken	front	None	None	False	False
+NOUN_ESIM.	ADV	PARTICLE	99	None	False	False	back	None	None	False	False
 NOUN_ESQUIMAU	NOUN	NOUN	21	None	False	weaken	back	o	None	False	False
 NOUN_EUGENE	NOUN	NOUN	2	None	False	weaken	back	None	None	False	False
 NOUN_EURO	NOUN	ACRONYM	0	None	False	False	back	None	None	False	False
@@ -2484,3 +2487,4 @@ X_51eikä	CONJ|VERB	CONJUNCTIONVERB	51	None	False	weaken	back	None	None	False	Fa
 X_51ettei	CONJ|VERB	CONJUNCTIONVERB	51	None	False	weaken	back	None	None	False	False
 X_51äläkä	CONJ|VERB	CONJUNCTIONVERB	51	None	False	weaken	back	None	None	False	False
 X_FORGN_EN	X	X	99	None	False	weaken	back	None	None	False	False
+X_FORGN_SV	X	X	99	None	False	weaken	back	None	None	False	False

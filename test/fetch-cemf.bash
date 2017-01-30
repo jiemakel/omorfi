@@ -23,8 +23,8 @@ mv cemf/ticklen_terminimedici1832.xml cemf-dict
 mv cemf/hoijerin_soitanto1877.xml cemf-dict
 mv cemf/tulkkijatk_1847.xml cemf-dict
 mv cemf/suomalainen_puhuttelija1860.xml cemf-dict
-python3 wordlists_from_dictionary_xml.py
-for f in cemf-dict/*.txt
+python3 wordlists-from-dictionary-xml.py
+for f in cemf-dict/*.uniq.freqs
 do
 	revuniqsort $f
 done
