@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Settings
-HFST_FLAGS=--verbose
+HFST_FLAGS=
 voikkosharedir=$(libdir)/voikko/3/
 BLACKLIST_FLAGS=-B PROPN-BLOCKING -B FGK
 # {{{ Files
@@ -120,8 +120,6 @@ GENERIC_AUTOMATA+=generated/omorfi.accept.hfst
 endif
 if WANT_TOKENISER
 GENERIC_AUTOMATA+=generated/omorfi.tokenise.pmatchfst \
-		  generated/omorfi.tokenise.pmatchfst.debug1 \
-		  generated/omorfi.tokenise.pmatchfst.debug2
 endif
 if WANT_LEMMATISE
 GENERIC_AUTOMATA+=generated/omorfi.lemmatise.hfst
@@ -175,9 +173,7 @@ endif
 OMOR_GENERATED=generated/omorfi-omor.lexc \
 			   generated/omorfi-omor.reweight \
 			   generated/omorfi-omor-tests.yaml \
-			   generated/omorfi-omor-rewrite-tags.regex \
-			   generated/omorfi-omor-between-tokens.regex.hfst \
-			   generated/omorfi-omor-token.regex.hfst
+			   generated/omorfi-omor-rewrite-tags.regex
 
 endif
 if WANT_APERTIUM
@@ -309,7 +305,7 @@ LEXEMES_TO_JOIN+=-i lexemes-col.tsv
 endif
 
 generated/joint.tsv: $(LEXEMES) $(LEMMA_JOINS) generated/timestamp
-	$(PYTHON) $(srcdir)/python/tsvjoin.py -v $(LEXEMES_TO_JOIN) \
+	$(PYTHON) $(srcdir)/python/tsvjoin.py $(LEXEMES_TO_JOIN) \
 		-j $(srcdir)/attributes/abbr.tsv \
 		-j $(srcdir)/attributes/adptype.tsv \
 		-j $(srcdir)/attributes/blacklisted.tsv \
@@ -329,7 +325,7 @@ generated/joint.tsv: $(LEXEMES) $(LEMMA_JOINS) generated/timestamp
 generated/master.tsv: generated/joint.tsv
 	$(PYTHON) $(srcdir)/python/tsv_expand.py \
 		-j $(srcdir)/paradigms/morphophonology.tsv \
-		-c $(srcdir)/paradigms/stub-deletions.tsv -v -i $< -o $@.unsrt
+		-c $(srcdir)/paradigms/stub-deletions.tsv -i $< -o $@.unsrt
 	head -n 1 < $@.unsrt > $@
 	tail -n +2 < $@.unsrt | sort -k 1,1 >> $@
 	-rm -f $@.unsrt
@@ -343,19 +339,19 @@ generated/inflections.tsv: $(INFLECTIONS) generated/timestamp
 # database to generic
 generated/omorfi.segment.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv -p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=none --none-segments
 
 generated/omorfi.lemmatise.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv -p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=none --none-lemmas
 
 generated/omorfi.accept.lexc:  generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv -p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=none
 
@@ -363,7 +359,7 @@ generated/omorfi.accept.lexc:  generated/master.tsv generated/stemparts.tsv \
 # segmented analysis experiment
 generated/omorfi-labelsegments.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv -p generated/stemparts.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv -p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=labelsegments
 
@@ -421,31 +417,22 @@ generated/omorfi-token-separator.regex:
 	$(PYTHON) $(srcdir)/python/generate-regexes.py \
 		-r token-separator -o $@
 
-generated/omorfi.tokenise.pmatchfst: tokeniser/omorfi.tokenise.pmatch
-	hfst-pmatch2fst -v -i $< > $@
-
-generated/omorfi.tokenise.pmatchfst.debug1: tokeniser/omorfi.tokenise.pmatch
-	hfst-pmatch2fst -v -i $< > $@
-
-generated/omorfi.tokenise.pmatchfst.debug2: tokeniser/omorfi.tokenise.pmatch
-	hfst-pmatch2fst -v -i $< -o $@
-
 generated/omorfi-hyphenate.twolc:
 	$(PYTHON) $(srcdir)/python/generate-twolcs.py -f=ftb3 -r hyphenate -o $@
 
 generated/omorfi-boundary.reweight:
-	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=boundary -o $@
+	$(PYTHON) $(srcdir)/python/generate-reweights.py -f=boundary -o $@
 
 # database to omor
 generated/omorfi-omor-tests.yaml: $(top_srcdir)/test/gtd-tests.tsv
-	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=omor -v
+	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=omor
 
 generated/omorfi-omor.reweight:
-	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=omor -o $@
+	$(PYTHON) $(srcdir)/python/generate-reweights.py -f=omor -o $@
 
 generated/omorfi-omor.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		-i generated/inflections.tsv -o $@ -f=omor \
 		$(BLACKLIST_FLAGS) \
@@ -454,7 +441,7 @@ generated/omorfi-omor.lexc: generated/master.tsv generated/stemparts.tsv \
 generated/omorfi-omor-guesser.lexc: paradigms/suffix-regexes.tsv \
 	paradigms/stub-deletions.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-guessers.py -v  \
+	$(PYTHON) $(srcdir)/python/generate-guessers.py   \
 		-r paradigms/suffix-regexes.tsv -d paradigms/stub-deletions.tsv \
 		-p generated/stemparts.tsv -i generated/inflections.tsv -o $@ -f=omor
 
@@ -464,13 +451,13 @@ generated/omorfi-omor-rewrite-tags.regex:
 
 # database to ftb3
 generated/omorfi-ftb3-tests.yaml: $(top_srcdir)/test/gtd-tests.tsv
-	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=ftb3 -v
+	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=ftb3
 
 generated/omorfi-ftb3.reweight:
-	$(PYTHON) $(srcdir)/python/generate-reweights.py -v -f=ftb3 -o $@
+	$(PYTHON) $(srcdir)/python/generate-reweights.py  -f=ftb3 -o $@
 
 generated/omorfi-ftb3.lexc: generated/master.tsv generated/stemparts.tsv generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py  -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=ftb3
@@ -486,28 +473,31 @@ generated/omorfi-ftb3-lemmatise.regex:
 # database to apertium
 generated/apertium-fin.fin.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) \
 		-i generated/inflections.tsv -o $@ -f=apertium
 
 generated/apertium-fin.fin.twolc:
-	$(PYTHON) $(srcdir)/python/generate-twolcs.py -v -f=apertium -r apertium -o $@
+	$(PYTHON) $(srcdir)/python/generate-twolcs.py -f=apertium -r apertium -o $@
 
 generated/apertium-fin.fin.yaml: $(top_srcdir)/test/gtd-tests.tsv
-	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=apertium -v
+	$(PYTHON) $(srcdir)/python/generate-yaml.py -i $< -o $@ -f=apertium
+
+generated/apertium-fin.fin.reweight:
+	$(PYTHON) $(srcdir)/python/generate-reweights.py -f=apertium -o $@
 
 # database to monodix
 generated/omorfi.dix: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-monodix.py -v -m generated/master.tsv \
+	$(PYTHON) $(srcdir)/python/generate-monodix.py -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		-i generated/inflections.tsv -o $@
 
 # database to giella
 generated/omorfi-giella.lexc: generated/master.tsv generated/stemparts.tsv \
 	generated/inflections.tsv
-	$(PYTHON) $(srcdir)/python/generate-lexcs.py -v -m generated/master.tsv \
+	$(PYTHON) $(srcdir)/python/generate-lexcs.py -m generated/master.tsv \
 		-p generated/stemparts.tsv \
 		$(BLACKLIST_FLAGS) -B TOOSHORTFORCOMPOUND \
 		-i generated/inflections.tsv -o $@ -f=giella
@@ -516,7 +506,7 @@ generated/omorfi-giella.lexc: generated/master.tsv generated/stemparts.tsv \
 
 # database (back) to kotus
 generated/omorfi-sanalista.xml: generated/master.tsv
-	$(PYTHON) $(srcdir)/python/generate-kotus-sanalista.py -v -m generated/master.tsv -o $@
+	$(PYTHON) $(srcdir)/python/generate-kotus-sanalista.py -m generated/master.tsv -o $@
 endif
 # }}}
 #
@@ -535,6 +525,9 @@ endif
 
 %.hfst: %.txt
 	$(HT2F) $< -o $@
+
+%.pmatchfst: %.pmatch
+	hfst-pmatch2fst $(HFST_FLAGS) -i $< > $@
 
 # }}}
 #
@@ -645,6 +638,9 @@ generated/omorfi.hyphenate-rules.hfst: generated/omorfi-hyphenate.twolc.hfst
 		$(HIX) - generated/omorfi.hyphenate-rules-3.hfst |\
 		$(HMIN) |\
 		$(HF2F) -f olw > $@
+
+generated/omorfi.tokenise.pmatch: tokeniser/omorfi.tokenise.pmatch
+	cp -v $< $@
 
 # }}}
 #
@@ -1425,5 +1421,14 @@ clean-local:
 		voikko/*hfst
 
 # }}}
+
+# {{{ other convenience targets...
+
+conversions: $(DB_GENERTED) $(GENERIC_GENERATED) $(OMOR_GENERATED) \
+	$(LABELSEGMENT_GENERATED) \
+	$(FTB3_GENERATED) $(APE_GENERATED)
+
+# }}}
+
 #
 # vim: set foldmethod=marker:
