@@ -18,7 +18,13 @@ def get_lemmas(anal):
     lemmas = re_lemma.finditer(anal[0])
     rv = []
     for lemma in lemmas:
-        rv += [lemma.group(1)]
+        s = lemma.group(1)
+        for i in range(32):
+            hnsuf = '_' + str(i)
+            if s.endswith(hnsuf):
+                s = s[:-len(hnsuf)]
+        rv += [s]
+
     return rv
 
 
@@ -50,7 +56,7 @@ def format_feats_ud(anal, hacks=None):
         key = f.split("=")[0].lstrip("[")
         value = f.split("=")[1].rstrip("]")
         if key == 'CASE':
-            if value == 'LAT':
+            if value == 'LAT' and hacks != 'ftb':
                 # XXX: hack to retain compability
                 rvs['Number'] = 'Sing'
             else:
@@ -66,8 +72,7 @@ def format_feats_ud(anal, hacks=None):
             elif 'PAST' in value:
                 rvs['Tense'] = 'Past'
         elif key == 'MOOD':
-            if not hacks:
-                rvs['VerbForm'] = 'Fin'
+            rvs['VerbForm'] = 'Fin'
             if value == 'INDV':
                 rvs['Mood'] = 'Ind'
             elif value == 'COND':
@@ -110,8 +115,7 @@ def format_feats_ud(anal, hacks=None):
                 rvs.pop('Voice')
             elif value == 'NEG':
                 rvs['Negative'] = 'Neg'
-                if not hacks:
-                    rvs['VerbForm'] = 'Fin'
+                rvs['VerbForm'] = 'Fin'
         elif key == 'PCP':
             rvs['VerbForm'] = 'Part'
             if value == 'VA':
@@ -148,8 +152,7 @@ def format_feats_ud(anal, hacks=None):
         elif key == 'SUBCAT':
             if value == 'NEG':
                 rvs['Negative'] = 'Neg'
-                if not hacks:
-                    rvs['VerbForm'] = 'Fin'
+                rvs['VerbForm'] = 'Fin'
             elif value == 'QUANTIFIER':
                 rvs['PronType'] = 'Ind'
             elif value == 'REFLEXIVE':
@@ -200,7 +203,9 @@ def format_feats_ud(anal, hacks=None):
                 # values found in UD finnish Derivs
                 rvs['Derivation'] = value[0] + value[1:].lower()
             elif value in ['S', 'MAISILLA', 'VA', 'MATON', 'UUS',
-                           'ADE', 'INE', 'ELA', 'ILL']:
+                           'ADE', 'INE', 'ELA', 'ILL', 'NEN', 'MPI', 'IN',
+                           'HKO', 'ISA', 'MAINEN', 'NUT', 'TU', 'VA', 'TAVA',
+                           'MA', 'LOC', 'LA']:
                 # valuse not found in UD finnish Derivs
                 continue
             else:
@@ -208,7 +213,7 @@ def format_feats_ud(anal, hacks=None):
                 print("in", anal[0])
                 exit(1)
         elif key in ['UPOS', 'ALLO', 'WEIGHT', 'CASECHANGE',
-                     'GUESS', 'PROPER', 'POSITION', 'SEM', 'CONJ','SEGMENT','DIALECT','KTN','KAV']:
+                     'GUESS', 'PROPER', 'POSITION', 'SEM', 'CONJ', 'SEGMENT', 'DIALECT', 'KTN', 'KAV']:
             # Not feats in UD:
             # * UPOS is another field
             # * Allomorphy is ignored
@@ -226,8 +231,8 @@ def format_feats_ud(anal, hacks=None):
             print("in", anal[0])
             exit(1)
     rv = ''
-    for k, v in sorted(rvs.items()):
-        rv += k + '=' + v + '|'
+    for k in sorted(rvs, key=str.lower):
+        rv += k + '=' + rvs[k] + '|'
     if len(rvs) != 0:
         return rv.rstrip('|')
     else:
@@ -422,6 +427,7 @@ def main():
     print("Tokens per timeunit:", tokens / (realend - realstart),
           file=options.statfile)
     exit(0)
+
 
 if __name__ == "__main__":
     main()

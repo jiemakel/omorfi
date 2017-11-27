@@ -19,10 +19,9 @@ def main():
     a.add_argument('-i', '--input', metavar="INFILE", type=open, required=True,
                    dest="infile", help="source of analysis data")
     a.add_argument('-o', '--output', metavar="outFILE", type=FileType('w'),
-            required=True,
-            dest="outfile", help="log file name")
+                   required=True, dest="outfile", help="log file name")
     a.add_argument('-mo', '--match-output', metavar="matchoutFILE", type=FileType('w'),
-            dest="matchoutfile",help="log file name for outputting matches")
+                   dest="matchoutfile", help="log file name for outputting matches")
     a.add_argument('-v', '--verbose', action="store_true", default=False,
                    help="Print verbosely while processing")
     a.add_argument('-c', '--count', metavar="FREQ", default=0,
@@ -93,6 +92,7 @@ def main():
         exit(1)
     else:
         exit(0)
+
 
 if __name__ == "__main__":
     main()

@@ -21,8 +21,8 @@
 
 from .error_logging import fail_formatting_missing_for, just_fail
 from .formatter import Formatter
-from .lexc_formatter import lexc_escape
 from .settings import deriv_boundary, morph_boundary, stub_boundary, weak_boundary, word_boundary
+from .string_manglers import lexc_escape
 
 
 class GiellaFormatter(Formatter):
@@ -53,7 +53,9 @@ class GiellaFormatter(Formatter):
         '+Dem',
         "+Dem",
         '+Der/inint',
+        '+Der/nen',
         '+Der/inen',
+        '+Der/hko',
         '+Der/ja',
         '+Der/lainen',
         '+Der/llinen',
@@ -65,6 +67,9 @@ class GiellaFormatter(Formatter):
         '+Der/tar',
         '+Der/tattaa',
         '+Der/tatuttaa',
+        '+Der/tuttaa',
+        '+Der/mainen',
+        '+Der/isa',
         '+Der/ton',
         '+Der/tse',
         '+Der/ttaa',
@@ -275,6 +280,15 @@ class GiellaFormatter(Formatter):
                     "Dtatuttaa": "+Der/tatuttaa",
                     "Dtava": "+PrsPrc+Pass",
                     "Dttaa": "+Der/ttaa",
+                    "Dtar": "+Der/tar",
+                    "Dmainen": "+Der/mainen",
+                    "Dton": "+Der/ton",
+                    "Dllinen": "+Der/llinen",
+                    "Dhko": "+Der/hko",
+                    "Disa": "+Der/isa",
+                    "Dnen": "+Der/nen",
+                    "Dtuttaa": "+Der/tuttaa",
+                    "Dlainen": "+Der/lainen",
                     "Dttain": "+Der/ttain",
                     "Dtu": "+PrfPrc+Pass",
                     "Du": "+Der/u",
@@ -299,6 +313,7 @@ class GiellaFormatter(Formatter):
                     "INTERJECTION": "+Interj",
                     "INTERROGATIVE": "+Interr",
                     "LAST": "+Sem/Human",
+                    "LEMMA-END": "",
                     "LEMMA-START": "",
                     "LOCATIVE": "",
                     "MEDIA": "",
@@ -332,6 +347,7 @@ class GiellaFormatter(Formatter):
                     "PRODUCT": "",
                     "PRONOUN": "+Pron",
                     "PROPER": "+Prop",
+                    "PROPN": "+Prop",
                     "Psg1": "+Sg1",
                     "Psg2": "+Sg2",
                     "Psg3": "+Sg3",
@@ -393,6 +409,10 @@ class GiellaFormatter(Formatter):
                     "": ""
                     }
 
+    subkeys2giella = {
+        "Z": ""
+    }
+
     def __init__(self, verbosity=False):
         self.verbosity = verbosity
         fail = False
@@ -411,18 +431,27 @@ class GiellaFormatter(Formatter):
             return "0"
         elif stuff in self.stuff2giella:
             return self.stuff2giella[stuff]
+        elif stuff[0] in self.subkeys2giella:
+            if self.subkeys2giella[stuff[0]] == '':
+                return ""
+            return self.subkeys2giella[stuff[0]] + stuff[1:]
         else:
             fail_formatting_missing_for(stuff, "giella.1")
             return ""
 
-    def analysis2lexc(self, anals):
+    def analyses2lexc(self, anals, surf):
         giellastring = ""
         for anal in anals.split('|'):
-            giellastring += self.stuff2lexc(anal)
+            if anal == '@@COPY-STEM@@':
+                giellastring += lexc_escape(surf)
+            elif anal.startswith('@@LITERAL:') and anal.endswith('@@'):
+                giellastring += lexc_escape(anal[len('@@LITERAL:'):-len('@@')])
+            else:
+                giellastring += self.stuff2lexc(anal)
         return giellastring
 
     def continuation2lexc(self, anals, surf, cont):
-        giellastring = self.analysis2lexc(anals)
+        giellastring = self.analyses2lexc(anals, surf)
         if 'DIGITS_' in cont and not ('BACK' in cont or 'FRONT' in cont):
             giellastring = lexc_escape(surf) + giellastring
         surf = lexc_escape(surf.replace(morph_boundary, ">")
@@ -461,10 +490,12 @@ class GiellaFormatter(Formatter):
         lex_stub = lexc_escape(wordmap['stub'].replace(word_boundary, "")
                                .replace(weak_boundary, "").replace(deriv_boundary, "»")
                                .replace(morph_boundary, ">"))
-        retvals = []
-        retvals += ["%s:%s\t%s\t;" % (wordmap['analysis'], lex_stub,
-                                      wordmap['new_para'])]
-        return "\n".join(retvals)
+        lexc_line = "%s:%s\t%s\t;" % (wordmap['analysis'], lex_stub,
+                                      wordmap['new_para'])
+        if 'BLACKLISTED' in wordmap['new_para']:
+            return "! ! !" + lexc_line
+        else:
+            return lexc_line
 
     def multichars_lexc(self):
         multichars = "Multichar_Symbols\n!! giellatekno multichar set:\n"

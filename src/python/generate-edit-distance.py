@@ -24,8 +24,6 @@ This script generates edit distance.
 import argparse
 from sys import exit
 
-from omorfi.settings import fin_lowercase, fin_symbols, fin_uppercase
-
 
 # standard UI stuff
 
@@ -62,8 +60,8 @@ def main():
         print("Creating EDs")
     out = "?*"
     for i in range(args.repeat):
-        out +=" ([?:0::1000 - 0]) ?*"
-    print(out,file=args.output)
+        out += " ([?:0::1000 - 0]) ?*"
+    print(out, file=args.output)
     exit(0)
 
 

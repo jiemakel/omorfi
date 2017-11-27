@@ -22,8 +22,8 @@
 
 from .error_logging import fail_formatting_missing_for, just_fail
 from .formatter import Formatter
-from .lexc_formatter import lexc_escape
 from .settings import optional_hyphen, weak_boundary, word_boundary
+from .string_manglers import lexc_escape
 
 
 class ApertiumFormatter(Formatter):
@@ -36,6 +36,7 @@ class ApertiumFormatter(Formatter):
         "abe",
         "abl",
         "acc",
+        "acr",
         "actv",
         "ade",
         "adv",
@@ -47,7 +48,7 @@ class ApertiumFormatter(Formatter):
         "cnjcoo><vblex",
         "cnjsub",
         "cnjadv",
-        "cm",
+        "cog",
         "com",
         "cond",
         "conneg",
@@ -59,7 +60,6 @@ class ApertiumFormatter(Formatter):
         "ess",
         "f",
         "gen",
-        "guio",
         "ij",
         "ill",
         "imp",
@@ -74,8 +74,6 @@ class ApertiumFormatter(Formatter):
         "itg",
         "lat",
         "loc",
-        "lpar",
-        "lquot",
         "m",
         "mf",
         "n",
@@ -107,6 +105,7 @@ class ApertiumFormatter(Formatter):
         "pprs",
         "pri",
         "prn",
+        "punct",
         "pxpl1",
         "pxpl2",
         "pxsg1",
@@ -117,11 +116,9 @@ class ApertiumFormatter(Formatter):
         "rec",
         "reflex",
         "rel",
-        "rpar",
-        "rquot",
-        "sent",
         "sg",
         "sup",
+        "sym",
         "top",
         "tra",
         "use_dialect",
@@ -170,7 +167,7 @@ class ApertiumFormatter(Formatter):
         "Aitä": "",
         "Ata": "",
         "ABBREVIATION": "abbr",
-        "ACRONYM": "abbr",
+        "ACRONYM": "acr",
         "ADJ": "adj",
         "ADP": "post",
         "ADPOSITION": "post",
@@ -192,7 +189,7 @@ class ApertiumFormatter(Formatter):
         "Cma": "agent",
         "Cmaton": "pneg",
         "Cnut": "pp",
-        "COMMA": "cm",
+        "COMMA": "",
         "COMPARATIVE": "cnjsub",
         "COMP": "com",
         "CONJUNCTION": "",
@@ -203,7 +200,7 @@ class ApertiumFormatter(Formatter):
         "Csup": "sup",
         "CULTGRP": "",
         "Cva": "pprs",
-        "DASH": "guio",
+        "DASH": "",
         "DECIMAL": "",
         "DERSTI": "",
         "DERTTAIN": "",
@@ -211,13 +208,23 @@ class ApertiumFormatter(Formatter):
         "DEMONSTRATIVE": "dem",
         "DIGIT": "",
         "Din": "+in<n",
-        "Ds": "",
+        "Din²": "",
+        "Ds": "+s<n",
+        "Dhko": "+hko<adj",
+        "Disa": "+isa<adj",
+        "Dllinen": "+llinen<n",
+        "Dlainen": "+lainen<n",
+        "Dla": "+la<n",
+        "Dnen": "+nen<n",
+        "Dtar": "+tar<n",
+        "Dton": "+ton<adj",
+        "Dmainen": "+mainen<adj",
         "Du": "+u<n",
         "Dtava": "+tava<adj",
         "Dma": "+ma<n",
         "Dinen": "+inen<n",
         "Dja": "+ja<n",
-        "Dmpi": "+mpi<adj",
+        "Dmpi": "",
         "Dmaisilla": "+maisilla<adv",
         "Dminen": "+minen<n",
         "Dnut": "+nut<adj",
@@ -229,11 +236,12 @@ class ApertiumFormatter(Formatter):
         "Dttaa": "+ttaa<vblex",
         "Dtattaa": "+tattaa<vblex",
         "Dtatuttaa": "+tatuttaa<vblex",
+        "Dtuttaa": "+tuttaa<vblex",
         "Dsti": "+sti<adv",
         "EVENT": "",
         "FEMALE": "f",
-        "FINAL-BRACKET": "rpar",
-        "FINAL-QUOTE": "rquot",
+        "FINAL-BRACKET": "",
+        "FINAL-QUOTE": "",
         "FIRST": "ant",
         "FRACTION": "",
         "GEO": "top",
@@ -242,13 +250,14 @@ class ApertiumFormatter(Formatter):
         "Ima": "infma",
         "Iminen": "infminen",
         "INDEFINITE": "ind",
-        "INITIAL-BRACKET": "lpar",
-        "INITIAL-QUOTE": "lquot",
+        "INITIAL-BRACKET": "",
+        "INITIAL-QUOTE": "",
         "INTRANSITIVE_arg": "vblex",
         "INTJ": "ij",
         "INTERROGATIVE": "itg",
-        "LAST": "ant",
+        "LAST": "cog",
         "LEMMA-START": "",
+        "LEMMA-END": "",
         "MALE": "m",
         "MAINF_arg": "vaux",
         "MEDIA": "",
@@ -285,7 +294,7 @@ class ApertiumFormatter(Formatter):
         "Psg1": "p1><sg",
         "Psg2": "p2><sg",
         "Psg3": "p3><sg",
-        "PUNCT": "",
+        "PUNCT": "punct",
         "Qhan": "+han<enc",
         "Qkaan": "+kaan<enc",
         "Qka": "+ka<enc",
@@ -303,11 +312,11 @@ class ApertiumFormatter(Formatter):
         "SG1": "p1",
         "SG2": "p2",
         "SG3": "p3",
-        "SENTENCE-BOUNDARY": "sent",
+        "SENTENCE-BOUNDARY": "",
         "SPACE": "",
         "SUFFIX": "",
         "SUPERL": "sup",
-        "SYM": "",
+        "SYM": "sym",
         "Tcond": "cond",
         "Timp": "imp",
         "Topt": "",
@@ -381,19 +390,19 @@ class ApertiumFormatter(Formatter):
             fail_formatting_missing_for(stuff, "apertium")
             return ""
 
-    def analyses2lexc(self, anals):
+    def analyses2lexc(self, anals, surf):
         apestring = ''
         for i in anals.split('|'):
-            apestring += self.stuff2lexc(i)
+            if i == '@@COPY-STEM@@':
+                apestring += lexc_escape(surf)
+            elif i.startswith('@@LITERAL:') and i.endswith('@@'):
+                apestring += lexc_escape(i[len('@@LITERAL:'):-len('@@')])
+            else:
+                apestring += self.stuff2lexc(i)
         return apestring
 
     def continuation2lexc(self, anals, surf, cont):
-        analstring = self.analyses2lexc(anals)
-        # the followings have surface fragments in continuations
-        if 'DIGITS_' in cont and not ('BACK' in cont or 'FRONT' in cont):
-            analstring = lexc_escape(surf) + analstring
-        elif 'PUNCT_NONSTD_EXCL_LOOP' in cont or 'PUNCT_NONSTD_DASH_LOOP' in cont:
-            analstring = lexc_escape(surf) + analstring
+        analstring = self.analyses2lexc(anals, surf)
         surf = lexc_escape(surf)
         return "%s:%s\t%s ;\n" % (analstring, surf, cont)
 
@@ -458,13 +467,15 @@ class ApertiumFormatter(Formatter):
         # XXX: for now
         if wordmap['lemma'] in "¹²³½¼=≥µ#/%":
             wordmap['analysis'] += self.stuff2lexc("NOUN")
-        retvals = ""
         wordmap['stub'] = wordmap['stub'].replace(
             word_boundary, optional_hyphen)
         wordmap['stub'] = lexc_escape(wordmap['stub'])
-        retvals += "%s:%s\t%s\t;" % (wordmap['analysis'], wordmap['stub'],
+        if 'BLACKLIST' in wordmap['new_para']:
+            return "!%s:%s\t%s\t;" % (wordmap['analysis'], wordmap['stub'],
+                                      wordmap['new_para'])
+        else:
+            return "%s:%s\t%s\t;" % (wordmap['analysis'], wordmap['stub'],
                                      wordmap['new_para'])
-        return retvals
 
     def multichars_lexc(self):
         multichars = "Multichar_Symbols\n!! Apertium standard tags:\n"

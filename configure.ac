@@ -2,12 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.64)
-AC_INIT([omorfi], [20160515], [https://github.com/flammie/omorfi/issues], [https://github.com/flammie/omorfi/])
+AC_INIT([omorfi], [20170515_alpha], [https://github.com/flammie/omorfi/issues], [https://github.com/flammie/omorfi/])
 AC_CONFIG_AUX_DIR([config-aux])
 AM_INIT_AUTOMAKE([1.12 -Wall -Wno-portability -Werror foreign dist-xz color-tests])
 
 PACKAGE=omorfi
-VERSION=20160515
+VERSION=20170515_alpha
 
 # Options
 AC_ARG_WITH([hfst],
@@ -55,7 +55,7 @@ AC_ARG_ENABLE([omor_paradigms],
                               [include new_para feature in omors @<:@default=disable@:>@])],
                               [enable_omor_paradigms=$enableval],
                               [enable_omor_paradigms=no])
-AS_IF([test x$enable_omor_paradigms != xno], 
+AS_IF([test x$enable_omor_paradigms != xno],
       [AC_SUBST([OMORPARAFLAG], ["--omor-new-para"])])
 AC_ARG_ENABLE([omor_allomorphs],
               [AS_HELP_STRING([--enable-omor-allomorphs],
@@ -286,7 +286,7 @@ AS_IF([test "x$with_hfst" = "xyes" ], [
        AC_PATH_PROG([ADT], [apertium-destxt], [cat])
        AS_IF([test x$ADT = xcat],
           [AC_MSG_WARN([corpus analysis script works better with apertium tools])])],
-    [AS_IF([test x$with_hfst != xno], 
+    [AS_IF([test x$with_hfst != xno],
            [AC_CHECK_FILES([$with_hfst/hfst-lexc $with_hfst/hfst-twolc $with_hfst/hfst-compose-intersect $with_hfst/hfst-invert $with_hfst/hfst-project $with_hfst/hfst-fst2fst $with_hfst/hfst-regexp2fst $with_hfst/hfst-substitute $with_hfst/hfst-minimize $with_hfst/hfst-compose $with_hfst/hfst-txt2fst $with_hfst/hfst-split $with_hfst/hfst-conjunct $with_hfst/hfst-proc $with_hfst/hfst-repeat $with_hfst/hfst-concatenate $with_hfst/hfst-disjunct $with_hfst/hfst-strings2fst $with_hfst/hfst-subtract $with_hfst/hfst-reweight], [HAVE_HFST=1], [AC_MSG_ERROR([HFST commandline tools are needed in $with_hfst])])
     AC_SUBST([HLEXC], $with_hfst/hfst-lexc)
     AC_SUBST([HTWOLC], $with_hfst/hfst-twolc)
@@ -318,7 +318,7 @@ AC_PATH_PROG([CGCOMP], [cg-comp], [false])
 AC_PATH_PROG([CGPROC], [cg-proc], [false])
 AM_CONDITIONAL([CAN_VISLCG3], [test x$CGCOMP != xfalse])
 
-AS_IF([test "x$enable_voikko" = "xyes"], 
+AS_IF([test "x$enable_voikko" = "xyes"],
       [AC_PATH_PROG([ZIP], [zip], [false])
        AS_IF([test "x$ZIP" = "xfalse"],
              [AC_MSG_ERROR([zip is required for voikko speller packages])])])
@@ -358,28 +358,6 @@ AC_CONFIG_FILES([Makefile src/Makefile src/voikko/index.xml
                  doc/Makefile test/Makefile test/test-header.yaml
                  omorfi.pc man/Makefile])
 AC_CONFIG_FILES([src/bash/omorfi.bash])
-AC_CONFIG_FILES([test/coverage-europarl.sh],
-                [chmod +x test/coverage-europarl.sh])
-AC_CONFIG_FILES([test/coverage-fiwiki.sh],
-                [chmod +x test/coverage-fiwiki.sh])
-AC_CONFIG_FILES([test/coverage-gutenberg.sh],
-                [chmod +x test/coverage-gutenberg.sh])
-AC_CONFIG_FILES([test/coverage-cemf.sh],
-                [chmod +x test/coverage-cemf.sh])
-AC_CONFIG_FILES([test/coverage-cemf-dict.sh],
-                [chmod +x test/coverage-cemf-dict.sh])
-AC_CONFIG_FILES([test/coverage-jrc-acquis.sh],
-                [chmod +x test/coverage-jrc-acquis.sh])
-AC_CONFIG_FILES([test/coverage-ftb-3.1.sh],
-                [chmod +x test/coverage-ftb-3.1.sh])
-AC_CONFIG_FILES([test/coverage-fi-ud.sh],
-                [chmod +x test/coverage-fi-ud.sh])
-AC_CONFIG_FILES([test/coverage-fi-ftb-ud.sh],
-                [chmod +x test/coverage-fi-ftb-ud.sh])
-AC_CONFIG_FILES([test/coverage-tatoeba.bash],
-                [chmod +x test/coverage-tatoeba.bash])
-AC_CONFIG_FILES([test/coverage-opensubtitles.bash],
-                [chmod +x test/coverage-opensubtitles.bash])
 AC_CONFIG_FILES([test/faithfulness-ftb-3.1.sh],
                 [chmod +x test/faithfulness-ftb-3.1.sh])
 AC_CONFIG_FILES([test/faithfulness-ftb-3.1-quick.sh],
@@ -392,6 +370,8 @@ AC_CONFIG_FILES([test/speed-test.sh],
                 [chmod +x test/speed-test.sh])
 AC_CONFIG_FILES([test/coverages-all-quick.sh],
                 [chmod +x test/coverages-all-quick.sh])
+AC_CONFIG_FILES([test/coverages-all-slow.bash],
+                [chmod +x test/coverages-all-slow.bash])
 AS_IF([test x$with_pbs_mail != xno],
       [AC_CONFIG_FILES([test/clusterstuff.pbs])])
 AS_IF([test x$with_slurm_mail != xno],
