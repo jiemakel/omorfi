@@ -119,7 +119,7 @@ if WANT_ACCEPTOR
 GENERIC_AUTOMATA+=generated/omorfi.accept.hfst
 endif
 if WANT_TOKENISER
-GENERIC_AUTOMATA+=generated/omorfi.tokenise.pmatchfst \
+GENERIC_AUTOMATA+=generated/omorfi.tokenise.pmatchfst
 endif
 if WANT_LEMMATISE
 GENERIC_AUTOMATA+=generated/omorfi.lemmatise.hfst
